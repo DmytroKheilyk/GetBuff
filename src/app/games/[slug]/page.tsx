@@ -44,7 +44,7 @@ export default async function GamePage({ params }: GamePageProps) {
   const onlineSellers = getOnlineSellersCount(offers);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-black">
       <SiteHeader />
       <GameHero
         game={game}

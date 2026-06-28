@@ -16,27 +16,28 @@ function formatListingsCount(count: number): string {
 export function GameCard({ game }: GameCardProps) {
   return (
     <Link href={`/games/${game.slug}`} className="group block">
-      <Card className="overflow-hidden border-border/60 bg-card/80 py-0 transition-all duration-300 hover:scale-[1.02] hover:border-emerald-500/40 hover:shadow-[0_0_30px_-5px_rgba(52,211,153,0.25)]">
+      <Card className="glass-panel relative overflow-hidden py-0 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-green-500/50 hover:shadow-[0_0_40px_-8px_rgba(34,197,94,0.35)]">
+        <div className="pointer-events-none absolute -inset-px rounded-xl bg-linear-to-b from-green-500/0 to-green-500/0 opacity-0 transition-opacity duration-300 group-hover:from-green-500/10 group-hover:to-transparent group-hover:opacity-100" />
         <div
           className={cn(
-            "relative flex h-36 items-end bg-linear-to-br p-4",
+            "relative flex h-40 items-end bg-linear-to-br p-4",
             game.gradientFrom,
             game.gradientTo
           )}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
-          <span className="relative text-xs font-semibold uppercase tracking-widest text-white/70">
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(74,222,128,0.2),transparent_55%)]" />
+          <span className="relative text-xs font-bold uppercase tracking-[0.25em] text-green-400/80">
             {game.slug}
           </span>
         </div>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">{game.name}</CardTitle>
+        <CardHeader className="relative pb-2">
+          <CardTitle className="text-base font-bold text-white">
+            {game.name}
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pb-4">
-          <Badge
-            variant="secondary"
-            className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/10"
-          >
+        <CardContent className="relative pb-5">
+          <Badge className="border-green-500/20 bg-green-500/10 font-semibold text-green-400 hover:bg-green-500/10">
             {formatListingsCount(game.listingsCount)} лотов
           </Badge>
         </CardContent>
