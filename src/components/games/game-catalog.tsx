@@ -11,7 +11,7 @@ import {
   type Offer,
   type OfferCategory,
   type SortOption,
-} from "@/lib/mock-offers";
+} from "@/lib/offers";
 
 type GameCatalogProps = {
   offers: Offer[];

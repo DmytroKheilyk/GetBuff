@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SellerRating } from "@/components/games/seller-rating";
-import type { Offer } from "@/lib/mock-offers";
+import type { Offer } from "@/lib/offers";
 import { cn } from "@/lib/utils";
 
 type OffersTableProps = {
@@ -35,9 +35,9 @@ export function OffersTable({ offers }: OffersTableProps) {
   if (offers.length === 0) {
     return (
       <div className="glass-panel rounded-xl px-6 py-16 text-center">
-        <p className="text-lg font-bold text-white">Лоты не найдены</p>
+        <p className="text-lg font-bold text-white">Лот пока не создан</p>
         <p className="mt-2 text-sm text-zinc-500">
-          Попробуйте изменить фильтры или выберите другую категорию
+          В этой категории ещё нет предложений — загляните позже
         </p>
       </div>
     );

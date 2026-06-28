@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { SortOption } from "@/lib/mock-offers";
+import type { SortOption } from "@/lib/offers";
 
 type OfferFiltersProps = {
   search: string;

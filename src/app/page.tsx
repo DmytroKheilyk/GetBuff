@@ -1,8 +1,11 @@
 import { PopularGamesGrid } from "@/components/home/popular-games-grid";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { fetchGames } from "@/lib/games";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const games = await fetchGames();
+
   return (
     <div className="flex min-h-screen flex-col bg-black">
       <SiteHeader />
@@ -29,7 +32,7 @@ export default function HomePage() {
               премиальный хаб для геймеров, которые знают цену своему луту.
             </p>
           </section>
-          <PopularGamesGrid />
+          <PopularGamesGrid games={games} />
         </div>
       </main>
       <SiteFooter />

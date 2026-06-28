@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Game } from "@/lib/mock-games";
+import type { Game } from "@/lib/games";
 
 type GameHeroProps = {
   game: Game;
@@ -55,7 +55,7 @@ export function GameHero({ game, onlineSellers, totalProducts }: GameHeroProps) 
           ◆ Каталог лотов
         </p>
         <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
-          {game.name}
+          {game.title}
         </h1>
 
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">

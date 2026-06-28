@@ -1,0 +1,84 @@
+-- GetBuff.store — схема базы данных
+-- Выполните этот скрипт в SQL Editor на https://supabase.com/dashboard
+
+-- ---------------------------------------------------------------------------
+-- Таблицы
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.games (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  slug text not null unique,
+  image_url text,
+  platform text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.offers (
+  id uuid primary key default gen_random_uuid(),
+  game_id uuid not null references public.games (id) on delete cascade,
+  seller_name text not null,
+  seller_avatar text,
+  seller_rating numeric(2, 1) not null default 5.0
+    check (seller_rating >= 0 and seller_rating <= 5),
+  is_online boolean not null default false,
+  description text not null,
+  price numeric(12, 2) not null check (price >= 0),
+  category text not null
+    check (category in ('currency', 'accounts', 'items', 'boost')),
+  created_at timestamptz not null default now()
+);
+
+-- ---------------------------------------------------------------------------
+-- Индексы
+-- ---------------------------------------------------------------------------
+
+create index if not exists idx_games_slug on public.games (slug);
+create index if not exists idx_offers_game_id on public.offers (game_id);
+create index if not exists idx_offers_category on public.offers (category);
+create index if not exists idx_offers_created_at on public.offers (created_at desc);
+
+-- ---------------------------------------------------------------------------
+-- Row Level Security (публичное чтение для маркетплейса)
+-- ---------------------------------------------------------------------------
+
+alter table public.games enable row level security;
+alter table public.offers enable row level security;
+
+create policy "games_select_public"
+  on public.games
+  for select
+  to anon, authenticated
+  using (true);
+
+create policy "offers_select_public"
+  on public.offers
+  for select
+  to anon, authenticated
+  using (true);
+
+-- ---------------------------------------------------------------------------
+-- Начальные данные (опционально — можно удалить, если заполняете вручную)
+-- ---------------------------------------------------------------------------
+
+insert into public.games (title, slug, image_url, platform) values
+  ('Counter-Strike 2', 'cs2', null, 'PC'),
+  ('Dota 2', 'dota-2', null, 'PC'),
+  ('Roblox', 'roblox', null, 'PC / Mobile'),
+  ('GTA V', 'gta-v', null, 'PC / Console')
+on conflict (slug) do nothing;
+
+-- Примеры лотов для Roblox (раскомментируйте после создания таблиц)
+/*
+insert into public.offers (game_id, seller_name, seller_avatar, seller_rating, is_online, description, price, category)
+select
+  g.id,
+  'RobuxFast',
+  'bg-sky-500/20 text-sky-400',
+  4.9,
+  true,
+  '1000 робуксов чистыми, моментальная доставка через gift',
+  890,
+  'currency'
+from public.games g where g.slug = 'roblox';
+*/

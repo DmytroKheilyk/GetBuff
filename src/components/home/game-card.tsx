@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Game } from "@/lib/mock-games";
+import type { Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 
 type GameCardProps = {
@@ -33,7 +33,7 @@ export function GameCard({ game }: GameCardProps) {
         </div>
         <CardHeader className="relative pb-2">
           <CardTitle className="text-base font-bold text-white">
-            {game.name}
+            {game.title}
           </CardTitle>
         </CardHeader>
         <CardContent className="relative pb-5">
