@@ -41,3 +41,7 @@ export const popularGames: Game[] = [
     gradientTo: "to-green-950",
   },
 ];
+
+export function getGameBySlug(slug: string): Game | undefined {
+  return popularGames.find((game) => game.slug === slug);
+}
