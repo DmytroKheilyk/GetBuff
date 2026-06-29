@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { Button } from "@/components/ui/button";
+import { HeaderAuth } from "@/components/layout/header-auth";
 import { Input } from "@/components/ui/input";
 
 const inputClassName =
@@ -25,12 +25,7 @@ export function SiteHeader() {
           />
         </div>
 
-        <Button
-          variant="outline"
-          className="neon-glow-hover ml-auto border-green-500/30 bg-green-500/10 font-semibold text-green-400 hover:border-green-400/50 hover:bg-green-500/20 hover:text-green-300"
-        >
-          Войти
-        </Button>
+        <HeaderAuth />
       </div>
 
       <div className="container mx-auto px-4 pb-3 md:hidden">
