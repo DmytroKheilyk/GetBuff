@@ -57,6 +57,12 @@ create policy "offers_select_public"
   to anon, authenticated
   using (true);
 
+create policy "offers_insert_authenticated"
+  on public.offers
+  for insert
+  to authenticated
+  with check (true);
+
 -- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)
 -- ---------------------------------------------------------------------------
