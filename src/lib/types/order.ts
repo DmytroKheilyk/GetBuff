@@ -17,3 +17,9 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   completed: "Выполнен",
   cancelled: "Отменён",
 };
+
+export const CHAT_ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: "Ожидает выполнения",
+  completed: "Выполнен",
+  cancelled: "Отменён",
+};

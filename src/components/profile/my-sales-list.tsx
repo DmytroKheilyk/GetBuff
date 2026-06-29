@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { OpenChatButton } from "@/components/chat/open-chat-button";
 import { completeOrder } from "@/lib/actions/complete-order";
 import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import { Button } from "@/components/ui/button";
@@ -123,6 +124,7 @@ export function MySalesList({ initialOrders }: MySalesListProps) {
                   <p className="text-xl font-black text-green-400">
                     {formatPrice(order.offerPrice)}
                   </p>
+                  <OpenChatButton orderId={order.id} />
                   {order.status === "pending" && (
                     <Button
                       size="sm"

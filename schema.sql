@@ -159,6 +159,69 @@ create policy "orders_update_seller"
   );
 
 -- ---------------------------------------------------------------------------
+-- Сообщения чата заказов
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.messages (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.orders (id) on delete cascade,
+  sender_name text not null,
+  content text not null check (char_length(trim(content)) > 0),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_messages_order_id on public.messages (order_id);
+create index if not exists idx_messages_created_at on public.messages (created_at);
+
+alter table public.messages enable row level security;
+
+-- Участник заказа: покупатель или продавец лота
+create policy "messages_select_participant"
+  on public.messages
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.orders ord
+      join public.offers o on o.id = ord.offer_id
+      where ord.id = messages.order_id
+        and (
+          ord.buyer_name = (auth.jwt() ->> 'email')
+          or ord.buyer_name = (auth.uid()::text)
+          or o.seller_name = (auth.jwt() ->> 'email')
+          or o.seller_name = (auth.uid()::text)
+        )
+    )
+  );
+
+create policy "messages_insert_participant"
+  on public.messages
+  for insert
+  to authenticated
+  with check (
+    (
+      sender_name = (auth.jwt() ->> 'email')
+      or sender_name = (auth.uid()::text)
+    )
+    and exists (
+      select 1
+      from public.orders ord
+      join public.offers o on o.id = ord.offer_id
+      where ord.id = messages.order_id
+        and (
+          ord.buyer_name = (auth.jwt() ->> 'email')
+          or ord.buyer_name = (auth.uid()::text)
+          or o.seller_name = (auth.jwt() ->> 'email')
+          or o.seller_name = (auth.uid()::text)
+        )
+    )
+  );
+
+-- Realtime: включите репликацию для public.messages в Supabase Dashboard
+-- Database → Replication → supabase_realtime → messages
+
+-- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)
 -- ---------------------------------------------------------------------------
 

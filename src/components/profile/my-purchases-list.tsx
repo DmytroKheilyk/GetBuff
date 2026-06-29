@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { OpenChatButton } from "@/components/chat/open-chat-button";
 import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import type { Order } from "@/lib/types/order";
 
@@ -73,9 +74,12 @@ export function MyPurchasesList({ orders }: MyPurchasesListProps) {
                   Продавец: {order.sellerName} · {formatDate(order.createdAt)}
                 </p>
               </div>
-              <p className="shrink-0 text-xl font-black text-green-400">
-                {formatPrice(order.offerPrice)}
-              </p>
+              <div className="flex shrink-0 flex-col items-end gap-3">
+                <p className="text-xl font-black text-green-400">
+                  {formatPrice(order.offerPrice)}
+                </p>
+                <OpenChatButton orderId={order.id} />
+              </div>
             </div>
           </div>
         ))}
