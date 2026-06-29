@@ -20,7 +20,10 @@ export type Seller = {
 export type Offer = {
   id: string;
   gameSlug: string;
-  category: OfferCategory;
+  /** Сырое значение category из БД */
+  categoryRaw: string;
+  /** Нормализованный ключ для фильтров (null если не распознан) */
+  categoryKey: OfferCategory | null;
   seller: Seller;
   description: string;
   price: number;
@@ -40,6 +43,46 @@ export type DbOfferRow = {
 };
 
 export type SortOption = "price-asc" | "price-desc" | "default";
+
+const CATEGORY_ALIASES: Record<string, OfferCategory> = {
+  currency: "currency",
+  валюта: "currency",
+  accounts: "accounts",
+  аккаунты: "accounts",
+  аккаунт: "accounts",
+  items: "items",
+  предметы: "items",
+  предмет: "items",
+  boost: "boost",
+  буст: "boost",
+  услуги: "boost",
+  "буст / услуги": "boost",
+  "буст/услуги": "boost",
+};
+
+export function normalizeCategory(raw: string): OfferCategory | null {
+  const key = raw.trim().toLowerCase();
+  return CATEGORY_ALIASES[key] ?? null;
+}
+
+export function matchesCategory(
+  rawCategory: string,
+  filter: OfferCategory
+): boolean {
+  const normalized = normalizeCategory(rawCategory);
+  if (normalized === filter) return true;
+  return rawCategory.trim().toLowerCase() === filter;
+}
+
+export function getCategoryDisplayLabel(raw: string): string {
+  const normalized = normalizeCategory(raw);
+  if (normalized) {
+    return (
+      OFFER_CATEGORIES.find((c) => c.id === normalized)?.label ?? raw
+    );
+  }
+  return raw;
+}
 
 const AVATAR_COLORS = [
   "bg-orange-500/20 text-orange-400",
@@ -64,7 +107,8 @@ export function mapDbOffer(row: DbOfferRow, gameSlug: string): Offer {
   return {
     id: row.id,
     gameSlug,
-    category: row.category as OfferCategory,
+    categoryRaw: row.category,
+    categoryKey: normalizeCategory(row.category),
     seller: {
       nickname: row.seller_name,
       avatarColor: resolveAvatarColor(row.seller_name, row.seller_avatar),
@@ -99,7 +143,9 @@ export function filterOffers(
     sort: SortOption;
   }
 ): Offer[] {
-  let result = offers.filter((offer) => offer.category === category);
+  let result = offers.filter((offer) =>
+    matchesCategory(offer.categoryRaw, category)
+  );
 
   const query = search.trim().toLowerCase();
   if (query) {

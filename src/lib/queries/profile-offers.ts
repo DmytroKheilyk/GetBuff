@@ -1,13 +1,15 @@
 import { createClient } from "@/lib/supabase";
 import { getSellerName } from "@/lib/user";
 import type { OfferCategory } from "@/lib/types/offer";
+import { normalizeCategory } from "@/lib/types/offer";
 import type { User } from "@supabase/supabase-js";
 
 export type ProfileOffer = {
   id: string;
   description: string;
   price: number;
-  category: OfferCategory;
+  categoryRaw: string;
+  categoryKey: OfferCategory | null;
   createdAt: string;
   gameTitle: string;
   gameSlug: string;
@@ -62,7 +64,8 @@ export async function fetchProfileOffers(
       id: row.id,
       description: row.description,
       price: Number(row.price),
-      category: row.category as OfferCategory,
+      categoryRaw: row.category,
+      categoryKey: normalizeCategory(row.category),
       createdAt: row.created_at,
       gameTitle: game?.title ?? "—",
       gameSlug: game?.slug ?? "",

@@ -81,5 +81,6 @@ export async function createOffer(
 
   revalidatePath(`/games/${game.slug}`);
   revalidatePath("/");
+  revalidatePath("/profile");
   redirect(`/games/${game.slug}`);
 }

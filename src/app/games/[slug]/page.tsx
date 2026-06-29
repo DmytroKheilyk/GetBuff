@@ -12,6 +12,8 @@ type GamePageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const slugs = await fetchGameSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -51,7 +53,7 @@ export default async function GamePage({ params }: GamePageProps) {
         totalProducts={offers.length}
       />
       <main className="container mx-auto flex-1 px-4 py-8">
-        <GameCatalog offers={offers} />
+        <GameCatalog offers={offers} gameTitle={game.title} />
       </main>
       <SiteFooter />
     </div>

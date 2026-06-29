@@ -40,14 +40,26 @@ function StatBlock({
 export function GameHero({ game, onlineSellers, totalProducts }: GameHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-zinc-800/80">
-      <div
-        className={cn(
-          "absolute inset-0 bg-linear-to-br opacity-40 blur-3xl",
-          game.gradientFrom,
-          game.gradientTo
-        )}
-      />
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      {game.imageUrl ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30"
+            style={{ backgroundImage: `url(${game.imageUrl})` }}
+          />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+        </>
+      ) : (
+        <>
+          <div
+            className={cn(
+              "absolute inset-0 bg-linear-to-br opacity-40 blur-3xl",
+              game.gradientFrom,
+              game.gradientTo
+            )}
+          />
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+        </>
+      )}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,197,94,0.15),transparent_60%)]" />
 
       <div className="container relative mx-auto px-4 py-10 sm:py-14">
@@ -57,6 +69,9 @@ export function GameHero({ game, onlineSellers, totalProducts }: GameHeroProps) 
         <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
           {game.title}
         </h1>
+        {game.platform && (
+          <p className="mt-2 text-sm text-zinc-500">{game.platform}</p>
+        )}
 
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <StatBlock
@@ -69,8 +84,8 @@ export function GameHero({ game, onlineSellers, totalProducts }: GameHeroProps) 
             label="товаров в каталоге"
           />
           <StatBlock
-            value={formatCount(game.listingsCount)}
-            label="всего лотов"
+            value={formatCount(totalProducts)}
+            label="активных лотов"
           />
         </div>
       </div>

@@ -10,7 +10,7 @@ import {
   deleteOffer,
   updateOfferPrice,
 } from "@/lib/actions/manage-offer";
-import { OFFER_CATEGORIES } from "@/lib/offers";
+import { getCategoryDisplayLabel } from "@/lib/offers";
 import type { ProfileOffer } from "@/lib/queries/profile-offers";
 import { cn } from "@/lib/utils";
 
@@ -20,12 +20,6 @@ type MyOffersListProps = {
 
 const fieldClassName =
   "h-8 border-zinc-800/80 bg-black/40 focus-visible:border-green-500/40 focus-visible:ring-green-500/20";
-
-function getCategoryLabel(category: string): string {
-  return (
-    OFFER_CATEGORIES.find((c) => c.id === category)?.label ?? category
-  );
-}
 
 function formatPrice(price: number): string {
   return `${price.toLocaleString("ru-RU")} ₽`;
@@ -170,7 +164,7 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
                       </span>
                     )}
                     <span className="rounded-full border border-zinc-800 bg-black/40 px-2 py-0.5 text-xs text-zinc-500">
-                      {getCategoryLabel(offer.category)}
+                      {getCategoryDisplayLabel(offer.categoryRaw)}
                     </span>
                     <span className="text-xs text-zinc-600">
                       {formatDate(offer.createdAt)}
