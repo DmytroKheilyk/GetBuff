@@ -20,13 +20,27 @@ export function GameCard({ game }: GameCardProps) {
         <div className="pointer-events-none absolute -inset-px rounded-xl bg-linear-to-b from-green-500/0 to-green-500/0 opacity-0 transition-opacity duration-300 group-hover:from-green-500/10 group-hover:to-transparent group-hover:opacity-100" />
         <div
           className={cn(
-            "relative flex h-40 items-end bg-linear-to-br p-4",
-            game.gradientFrom,
-            game.gradientTo
+            "relative flex h-40 items-end overflow-hidden bg-linear-to-br p-4",
+            !game.imageUrl && game.gradientFrom,
+            !game.imageUrl && game.gradientTo
           )}
         >
-          <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(74,222,128,0.2),transparent_55%)]" />
+          {game.imageUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={game.imageUrl}
+                alt=""
+                className="absolute inset-0 size-full object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(74,222,128,0.2),transparent_55%)]" />
+            </>
+          )}
           <span className="relative text-xs font-bold uppercase tracking-[0.25em] text-green-400/80">
             {game.slug}
           </span>
