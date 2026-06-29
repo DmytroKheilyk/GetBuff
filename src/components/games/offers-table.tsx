@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AuthModal } from "@/components/auth/auth-modal";
 import { BuyOfferDialog } from "@/components/games/buy-offer-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { createClient } from "@/lib/supabase/client";
 import {
   getCategoryDisplayLabel,
   type Offer,
@@ -29,8 +31,19 @@ function formatPrice(price: number): string {
 export function OffersTable({ offers }: OffersTableProps) {
   const [buyOffer, setBuyOffer] = useState<Offer | null>(null);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
-  function handleBuy(offer: Offer) {
+  async function handleBuy(offer: Offer) {
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      setAuthOpen(true);
+      return;
+    }
+
     setBuyOffer(offer);
     setBuyOpen(true);
   }
@@ -87,7 +100,7 @@ export function OffersTable({ offers }: OffersTableProps) {
                 <TableCell className="text-right">
                   <Button
                     size="sm"
-                    className="neon-glow-hover border border-green-500/30 bg-green-500 font-bold text-black hover:bg-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.45)]"
+                    className="neon-glow-hover border border-green-500/30 bg-green-500 font-bold text-black transition-all duration-300 hover:bg-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.45)]"
                     onClick={() => handleBuy(offer)}
                   >
                     Купить
@@ -104,6 +117,7 @@ export function OffersTable({ offers }: OffersTableProps) {
         open={buyOpen}
         onOpenChange={setBuyOpen}
       />
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </>
   );
 }

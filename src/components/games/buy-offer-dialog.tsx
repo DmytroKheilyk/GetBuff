@@ -1,5 +1,9 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+
+import { createOrder } from "@/lib/actions/create-order";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,39 +29,126 @@ export function BuyOfferDialog({
   open,
   onOpenChange,
 }: BuyOfferDialogProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen) {
+      setError(null);
+      setSuccess(false);
+      setLoading(false);
+    }
+    onOpenChange(nextOpen);
+  }
+
+  async function handleConfirm() {
+    if (!offer) return;
+    setError(null);
+    setLoading(true);
+
+    const result = await createOrder(offer.id);
+
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    setSuccess(true);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="glass-panel border-zinc-800/80 bg-zinc-950/95 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-black text-white">
-            Механика покупки{" "}
-            <span className="text-neon-gradient">в разработке</span>
-          </DialogTitle>
-          <DialogDescription className="text-zinc-500">
-            Скоро вы сможете безопасно оформить сделку прямо на GetBuff.store
-          </DialogDescription>
-        </DialogHeader>
+        {success ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black text-white">
+                Заказ{" "}
+                <span className="text-neon-gradient">успешно создан!</span>
+              </DialogTitle>
+              <DialogDescription className="text-zinc-400">
+                Продавец уведомлён. Отслеживайте статус в личном кабинете →
+                «Мои покупки».
+              </DialogDescription>
+            </DialogHeader>
+            {offer && (
+              <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-4">
+                <p className="text-sm text-zinc-300">{offer.description}</p>
+                <p className="mt-2 text-lg font-black text-green-400">
+                  {formatPrice(offer.price)}
+                </p>
+              </div>
+            )}
+            <Button
+              onClick={() => handleOpenChange(false)}
+              className="neon-glow-hover w-full border border-green-500/30 bg-green-500 font-bold text-black hover:bg-green-400"
+            >
+              Отлично
+            </Button>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black text-white">
+                Подтверждение{" "}
+                <span className="text-neon-gradient">покупки</span>
+              </DialogTitle>
+              <DialogDescription className="text-zinc-500">
+                Вы действительно хотите оформить этот заказ?
+              </DialogDescription>
+            </DialogHeader>
 
-        {offer && (
-          <div className="space-y-3 rounded-lg border border-zinc-800/80 bg-black/40 p-4">
-            <p className="text-sm leading-relaxed text-zinc-300">
-              {offer.description}
-            </p>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500">{offer.seller.nickname}</span>
-              <span className="text-lg font-black text-green-400">
-                {formatPrice(offer.price)}
-              </span>
+            {offer && (
+              <div className="space-y-4 rounded-lg border border-zinc-800/80 bg-black/40 p-4">
+                <p className="text-sm leading-relaxed text-zinc-300">
+                  {offer.description}
+                </p>
+                <div className="flex items-center justify-between border-t border-zinc-800/80 pt-3">
+                  <span className="text-sm text-zinc-500">
+                    {offer.seller.nickname}
+                  </span>
+                  <span className="text-xl font-black text-green-400 drop-shadow-[0_0_12px_rgba(74,222,128,0.3)]">
+                    {formatPrice(offer.price)}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                {error}
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                disabled={loading}
+                onClick={() => handleOpenChange(false)}
+                className="flex-1 border-zinc-700 bg-transparent text-zinc-400 hover:bg-zinc-800/50"
+              >
+                Отмена
+              </Button>
+              <Button
+                disabled={loading || !offer}
+                onClick={handleConfirm}
+                className="neon-glow-hover flex-1 border border-green-500/30 bg-green-500 font-bold text-black hover:bg-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.45)]"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Оформление...
+                  </>
+                ) : (
+                  "Подтвердить"
+                )}
+              </Button>
             </div>
-          </div>
+          </>
         )}
-
-        <Button
-          onClick={() => onOpenChange(false)}
-          className="neon-glow-hover w-full border border-green-500/30 bg-green-500 font-bold text-black hover:bg-green-400"
-        >
-          Понятно
-        </Button>
       </DialogContent>
     </Dialog>
   );

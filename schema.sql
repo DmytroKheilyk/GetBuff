@@ -29,6 +29,15 @@ create table if not exists public.offers (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  offer_id uuid not null references public.offers (id) on delete cascade,
+  buyer_name text not null,
+  status text not null default 'pending'
+    check (status in ('pending', 'completed', 'cancelled')),
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------------
 -- Индексы
 -- ---------------------------------------------------------------------------
@@ -37,6 +46,9 @@ create index if not exists idx_games_slug on public.games (slug);
 create index if not exists idx_offers_game_id on public.offers (game_id);
 create index if not exists idx_offers_category on public.offers (category);
 create index if not exists idx_offers_created_at on public.offers (created_at desc);
+create index if not exists idx_orders_offer_id on public.orders (offer_id);
+create index if not exists idx_orders_buyer_name on public.orders (buyer_name);
+create index if not exists idx_orders_status on public.orders (status);
 
 -- ---------------------------------------------------------------------------
 -- Row Level Security (публичное чтение для маркетплейса)
@@ -44,6 +56,7 @@ create index if not exists idx_offers_created_at on public.offers (created_at de
 
 alter table public.games enable row level security;
 alter table public.offers enable row level security;
+alter table public.orders enable row level security;
 
 create policy "games_select_public"
   on public.games
@@ -86,6 +99,64 @@ create policy "offers_delete_own"
   );
 
 create index if not exists idx_offers_seller_name on public.offers (seller_name);
+
+create policy "orders_select_buyer"
+  on public.orders
+  for select
+  to authenticated
+  using (
+    buyer_name = (auth.jwt() ->> 'email')
+    or buyer_name = (auth.uid()::text)
+  );
+
+create policy "orders_select_seller"
+  on public.orders
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.offers o
+      where o.id = orders.offer_id
+        and (
+          o.seller_name = (auth.jwt() ->> 'email')
+          or o.seller_name = (auth.uid()::text)
+        )
+    )
+  );
+
+create policy "orders_insert_buyer"
+  on public.orders
+  for insert
+  to authenticated
+  with check (
+    buyer_name = (auth.jwt() ->> 'email')
+    or buyer_name = (auth.uid()::text)
+  );
+
+create policy "orders_update_seller"
+  on public.orders
+  for update
+  to authenticated
+  using (
+    exists (
+      select 1 from public.offers o
+      where o.id = orders.offer_id
+        and (
+          o.seller_name = (auth.jwt() ->> 'email')
+          or o.seller_name = (auth.uid()::text)
+        )
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.offers o
+      where o.id = orders.offer_id
+        and (
+          o.seller_name = (auth.jwt() ->> 'email')
+          or o.seller_name = (auth.uid()::text)
+        )
+    )
+  );
 
 -- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)

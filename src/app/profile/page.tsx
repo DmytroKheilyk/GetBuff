@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 
-import { MyOffersList } from "@/components/profile/my-offers-list";
+import { ProfileDashboard } from "@/components/profile/profile-dashboard";
 import { ProfileGate } from "@/components/profile/profile-gate";
 import { UserInfoCard } from "@/components/profile/user-info-card";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { fetchMyPurchases, fetchMySales } from "@/lib/queries/orders";
 import { fetchProfileOffers } from "@/lib/queries/profile-offers";
 import { createClient } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: "Личный кабинет — GetBuff.store",
-  description: "Управляйте своими лотами на GetBuff.store",
+  description: "Управляйте лотами, покупками и продажами на GetBuff.store",
 };
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,13 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const offers = user ? await fetchProfileOffers(user) : [];
+  const [offers, purchases, sales] = user
+    ? await Promise.all([
+        fetchProfileOffers(user),
+        fetchMyPurchases(user),
+        fetchMySales(user),
+      ])
+    : [[], [], []];
 
   return (
     <div className="flex min-h-screen flex-col bg-black">
@@ -32,7 +39,11 @@ export default async function ProfilePage() {
         {user ? (
           <div className="container relative mx-auto space-y-6 px-4 py-10 sm:space-y-8 sm:py-14">
             <UserInfoCard user={user} />
-            <MyOffersList initialOffers={offers} />
+            <ProfileDashboard
+              offers={offers}
+              purchases={purchases}
+              sales={sales}
+            />
           </div>
         ) : (
           <ProfileGate />
