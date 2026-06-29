@@ -63,6 +63,30 @@ create policy "offers_insert_authenticated"
   to authenticated
   with check (true);
 
+create policy "offers_update_own"
+  on public.offers
+  for update
+  to authenticated
+  using (
+    seller_name = (auth.jwt() ->> 'email')
+    or seller_name = (auth.uid()::text)
+  )
+  with check (
+    seller_name = (auth.jwt() ->> 'email')
+    or seller_name = (auth.uid()::text)
+  );
+
+create policy "offers_delete_own"
+  on public.offers
+  for delete
+  to authenticated
+  using (
+    seller_name = (auth.jwt() ->> 'email')
+    or seller_name = (auth.uid()::text)
+  );
+
+create index if not exists idx_offers_seller_name on public.offers (seller_name);
+
 -- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)
 -- ---------------------------------------------------------------------------

@@ -1,17 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { AuthModal } from "@/components/auth/auth-modal";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { getUserInitial } from "@/lib/user";
 import { cn } from "@/lib/utils";
-
-function getUserInitial(user: User): string {
-  const email = user.email ?? "";
-  return email.charAt(0).toUpperCase() || "?";
-}
 
 export function HeaderAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -53,16 +50,17 @@ export function HeaderAuth() {
   if (user) {
     return (
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <div
+        <Link
+          href="/profile"
           className={cn(
-            "flex size-9 items-center justify-center rounded-full",
+            "flex size-9 items-center justify-center rounded-full transition-opacity hover:opacity-80",
             "border border-green-500/30 bg-green-500/10 text-sm font-bold text-green-400",
             "shadow-[0_0_12px_rgba(34,197,94,0.2)]"
           )}
-          title={user.email ?? "Аккаунт"}
+          title={user.email ?? "Личный кабинет"}
         >
           {getUserInitial(user)}
-        </div>
+        </Link>
         <Button
           variant="outline"
           size="sm"

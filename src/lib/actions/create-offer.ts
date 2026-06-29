@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase";
 import type { OfferCategory } from "@/lib/types/offer";
+import { getSellerName } from "@/lib/user";
 
 const VALID_CATEGORIES: OfferCategory[] = [
   "currency",
@@ -63,7 +64,7 @@ export async function createOffer(
     return { error: "Игра не найдена" };
   }
 
-  const sellerName = user.email ?? user.id;
+  const sellerName = getSellerName(user);
 
   const { error: insertError } = await supabase.from("offers").insert({
     game_id: gameId,
