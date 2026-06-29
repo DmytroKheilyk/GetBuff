@@ -7,15 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProfileOffer } from "@/lib/queries/profile-offers";
 import type { Order } from "@/lib/types/order";
 
+import type { OrderReviewSummary } from "@/lib/types/review";
+
 type ProfileDashboardProps = {
   offers: ProfileOffer[];
   purchases: Order[];
+  purchaseReviews: OrderReviewSummary[];
   sales: Order[];
 };
 
 export function ProfileDashboard({
   offers,
   purchases,
+  purchaseReviews,
   sales,
 }: ProfileDashboardProps) {
   return (
@@ -60,7 +64,10 @@ export function ProfileDashboard({
         <MyOffersList initialOffers={offers} />
       </TabsContent>
       <TabsContent value="purchases" className="animate-in fade-in duration-300">
-        <MyPurchasesList orders={purchases} />
+        <MyPurchasesList
+          orders={purchases}
+          initialReviews={purchaseReviews}
+        />
       </TabsContent>
       <TabsContent value="sales" className="animate-in fade-in duration-300">
         <MySalesList initialOrders={sales} />

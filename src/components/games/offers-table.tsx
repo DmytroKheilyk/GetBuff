@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { AuthModal } from "@/components/auth/auth-modal";
 import { BuyOfferDialog } from "@/components/games/buy-offer-dialog";
+import { SellerRatingDisplay } from "@/components/reviews/seller-rating-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,9 +84,15 @@ export function OffersTable({ offers }: OffersTableProps) {
                   </p>
                 </TableCell>
                 <TableCell>
-                  <p className="truncate font-semibold text-white">
-                    {offer.seller.nickname}
-                  </p>
+                  <div className="space-y-1">
+                    <p className="truncate font-semibold text-white">
+                      {offer.seller.nickname}
+                    </p>
+                    <SellerRatingDisplay
+                      reviewAverage={offer.seller.reviewAverage}
+                      reviewCount={offer.seller.reviewCount}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge className="border-green-500/20 bg-green-500/10 text-xs font-medium text-green-400 hover:bg-green-500/10">

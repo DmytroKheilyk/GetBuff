@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { fetchMyPurchases, fetchMySales } from "@/lib/queries/orders";
 import { fetchProfileOffers } from "@/lib/queries/profile-offers";
+import { fetchReviewsForOrders } from "@/lib/queries/reviews";
 import { createClient } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -22,13 +23,21 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [offers, purchases, sales] = user
-    ? await Promise.all([
-        fetchProfileOffers(user),
-        fetchMyPurchases(user),
-        fetchMySales(user),
-      ])
-    : [[], [], []];
+  let offers: Awaited<ReturnType<typeof fetchProfileOffers>> = [];
+  let purchases: Awaited<ReturnType<typeof fetchMyPurchases>> = [];
+  let sales: Awaited<ReturnType<typeof fetchMySales>> = [];
+  let purchaseReviews: Awaited<ReturnType<typeof fetchReviewsForOrders>> = [];
+
+  if (user) {
+    [offers, purchases, sales] = await Promise.all([
+      fetchProfileOffers(user),
+      fetchMyPurchases(user),
+      fetchMySales(user),
+    ]);
+    purchaseReviews = await fetchReviewsForOrders(
+      purchases.map((order) => order.id)
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-black">
@@ -42,6 +51,7 @@ export default async function ProfilePage() {
             <ProfileDashboard
               offers={offers}
               purchases={purchases}
+              purchaseReviews={purchaseReviews}
               sales={sales}
             />
           </div>

@@ -1,4 +1,5 @@
 import { createDataClient } from "@/lib/supabase";
+import { fetchSellerRatingStats } from "@/lib/queries/reviews";
 import { mapDbOffer, type DbOfferRow, type Offer } from "@/lib/types/offer";
 
 export async function fetchOffersByGameId(
@@ -18,5 +19,22 @@ export async function fetchOffersByGameId(
     return [];
   }
 
-  return (data as DbOfferRow[]).map((row) => mapDbOffer(row, gameSlug));
+  const offers = (data as DbOfferRow[]).map((row) => mapDbOffer(row, gameSlug));
+
+  const sellerNames = offers.map((offer) => offer.seller.nickname);
+  const statsMap = await fetchSellerRatingStats(sellerNames);
+
+  return offers.map((offer) => {
+    const stats = statsMap.get(offer.seller.nickname);
+    if (!stats) return offer;
+
+    return {
+      ...offer,
+      seller: {
+        ...offer.seller,
+        reviewAverage: stats.average,
+        reviewCount: stats.count,
+      },
+    };
+  });
 }

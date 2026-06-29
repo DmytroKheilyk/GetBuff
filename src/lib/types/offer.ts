@@ -13,7 +13,11 @@ export const OFFER_CATEGORIES: {
 export type Seller = {
   nickname: string;
   avatarColor: string;
+  /** Рейтинг из колонки offers (legacy) */
   rating: number;
+  /** Средний рейтинг по отзывам из таблицы reviews */
+  reviewAverage: number | null;
+  reviewCount: number;
   online: boolean;
 };
 
@@ -113,6 +117,8 @@ export function mapDbOffer(row: DbOfferRow, gameSlug: string): Offer {
       nickname: row.seller_name,
       avatarColor: resolveAvatarColor(row.seller_name, row.seller_avatar),
       rating: Number(row.seller_rating),
+      reviewAverage: null,
+      reviewCount: 0,
       online: row.is_online,
     },
     description: row.description,

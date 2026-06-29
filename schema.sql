@@ -222,6 +222,53 @@ create policy "messages_insert_participant"
 -- Database → Replication → supabase_realtime → messages
 
 -- ---------------------------------------------------------------------------
+-- Отзывы о продавцах
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null unique references public.orders (id) on delete cascade,
+  buyer_name text not null,
+  seller_name text not null,
+  rating integer not null check (rating >= 1 and rating <= 5),
+  comment text not null check (char_length(trim(comment)) > 0),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_reviews_order_id on public.reviews (order_id);
+create index if not exists idx_reviews_seller_name on public.reviews (seller_name);
+create index if not exists idx_reviews_created_at on public.reviews (created_at desc);
+
+alter table public.reviews enable row level security;
+
+create policy "reviews_select_public"
+  on public.reviews
+  for select
+  to anon, authenticated
+  using (true);
+
+create policy "reviews_insert_buyer_completed"
+  on public.reviews
+  for insert
+  to authenticated
+  with check (
+    (
+      buyer_name = (auth.jwt() ->> 'email')
+      or buyer_name = (auth.uid()::text)
+    )
+    and exists (
+      select 1
+      from public.orders ord
+      where ord.id = reviews.order_id
+        and ord.status = 'completed'
+        and (
+          ord.buyer_name = (auth.jwt() ->> 'email')
+          or ord.buyer_name = (auth.uid()::text)
+        )
+    )
+  );
+
+-- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)
 -- ---------------------------------------------------------------------------
 
