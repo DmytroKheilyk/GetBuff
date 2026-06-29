@@ -269,6 +269,91 @@ create policy "reviews_insert_buyer_completed"
   );
 
 -- ---------------------------------------------------------------------------
+-- Виртуальные кошельки
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.wallets (
+  user_email text primary key,
+  balance numeric(12, 2) not null default 5000 check (balance >= 0),
+  created_at timestamptz not null default now()
+);
+
+alter table public.wallets enable row level security;
+
+create policy "wallets_select_own"
+  on public.wallets
+  for select
+  to authenticated
+  using (user_email = (auth.jwt() ->> 'email'));
+
+create policy "wallets_insert_own"
+  on public.wallets
+  for insert
+  to authenticated
+  with check (user_email = (auth.jwt() ->> 'email'));
+
+create policy "wallets_update_own"
+  on public.wallets
+  for update
+  to authenticated
+  using (user_email = (auth.jwt() ->> 'email'))
+  with check (user_email = (auth.jwt() ->> 'email'));
+
+-- Атомарный перевод при покупке (списание у покупателя, зачисление продавцу)
+create or replace function public.process_order_payment(
+  p_buyer_name text,
+  p_seller_name text,
+  p_amount numeric
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_buyer_balance numeric;
+  v_caller text;
+begin
+  v_caller := auth.jwt() ->> 'email';
+
+  if p_buyer_name is distinct from v_caller then
+    raise exception 'forbidden';
+  end if;
+
+  if p_amount is null or p_amount <= 0 then
+    raise exception 'invalid_amount';
+  end if;
+
+  insert into public.wallets (user_email, balance)
+  values (p_buyer_name, 5000)
+  on conflict (user_email) do nothing;
+
+  insert into public.wallets (user_email, balance)
+  values (p_seller_name, 5000)
+  on conflict (user_email) do nothing;
+
+  select balance into v_buyer_balance
+  from public.wallets
+  where user_email = p_buyer_name
+  for update;
+
+  if v_buyer_balance is null or v_buyer_balance < p_amount then
+    raise exception 'insufficient_funds';
+  end if;
+
+  update public.wallets
+  set balance = balance - p_amount
+  where user_email = p_buyer_name;
+
+  update public.wallets
+  set balance = balance + p_amount
+  where user_email = p_seller_name;
+end;
+$$;
+
+grant execute on function public.process_order_payment(text, text, numeric) to authenticated;
+
+-- ---------------------------------------------------------------------------
 -- Начальные данные (опционально — можно удалить, если заполняете вручную)
 -- ---------------------------------------------------------------------------
 

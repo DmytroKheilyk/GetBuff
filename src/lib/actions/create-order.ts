@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getOrCreateWallet } from "@/lib/queries/wallet";
 import { createClient } from "@/lib/supabase";
-import { getSellerName } from "@/lib/user";
+import { getSellerName, getWalletUserEmail } from "@/lib/user";
 
 export type CreateOrderResult = {
   success?: boolean;
   error?: string;
+  chargedAmount?: number;
 };
 
 export async function createOrder(offerId: string): Promise<CreateOrderResult> {
@@ -21,10 +23,16 @@ export async function createOrder(offerId: string): Promise<CreateOrderResult> {
   }
 
   const buyerName = getSellerName(user);
+  const buyerEmail = getWalletUserEmail(user);
+
+  if (!buyerEmail) {
+    console.error("[wallet:createOrder] user.email is missing", { userId: user.id });
+    return { error: "Email пользователя не найден" };
+  }
 
   const { data: offer, error: offerError } = await supabase
     .from("offers")
-    .select("id, seller_name, games(slug)")
+    .select("id, price, seller_name, games(slug)")
     .eq("id", offerId)
     .maybeSingle();
 
@@ -34,6 +42,35 @@ export async function createOrder(offerId: string): Promise<CreateOrderResult> {
 
   if (offer.seller_name === buyerName) {
     return { error: "Нельзя купить собственный лот" };
+  }
+
+  const price = Number(offer.price);
+
+  const buyerWallet = await getOrCreateWallet(supabase, buyerEmail);
+
+  if (!buyerWallet) {
+    return { error: "Не удалось проверить баланс" };
+  }
+
+  if (buyerWallet.balance < price) {
+    return {
+      error: "Недостаточно средств на балансе! Пополните счет.",
+    };
+  }
+
+  const { error: paymentError } = await supabase.rpc("process_order_payment", {
+    p_buyer_name: buyerEmail,
+    p_seller_name: offer.seller_name,
+    p_amount: price,
+  });
+
+  if (paymentError) {
+    if (paymentError.message.includes("insufficient_funds")) {
+      return {
+        error: "Недостаточно средств на балансе! Пополните счет.",
+      };
+    }
+    return { error: paymentError.message };
   }
 
   const { error: insertError } = await supabase.from("orders").insert({
@@ -52,7 +89,7 @@ export async function createOrder(offerId: string): Promise<CreateOrderResult> {
   }
   revalidatePath("/profile");
 
-  return { success: true };
+  return { success: true, chargedAmount: price };
 }
 
 function extractGameSlug(games: unknown): string | null {

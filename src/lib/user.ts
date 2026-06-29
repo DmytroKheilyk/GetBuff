@@ -4,6 +4,11 @@ export function getSellerName(user: User): string {
   return user.email ?? user.id;
 }
 
+/** Email для таблицы wallets (поле user_email) */
+export function getWalletUserEmail(user: User): string | null {
+  return user.email ?? null;
+}
+
 export function getUserInitial(user: User): string {
   const email = user.email ?? "";
   return email.charAt(0).toUpperCase() || "?";

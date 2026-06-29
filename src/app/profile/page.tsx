@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { fetchMyPurchases, fetchMySales } from "@/lib/queries/orders";
 import { fetchProfileOffers } from "@/lib/queries/profile-offers";
 import { fetchReviewsForOrders } from "@/lib/queries/reviews";
+import { getOrCreateWallet } from "@/lib/queries/wallet";
 import { createClient } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function ProfilePage() {
   let purchases: Awaited<ReturnType<typeof fetchMyPurchases>> = [];
   let sales: Awaited<ReturnType<typeof fetchMySales>> = [];
   let purchaseReviews: Awaited<ReturnType<typeof fetchReviewsForOrders>> = [];
+  let walletBalance = 0;
 
   if (user) {
     [offers, purchases, sales] = await Promise.all([
@@ -37,6 +39,13 @@ export default async function ProfilePage() {
     purchaseReviews = await fetchReviewsForOrders(
       purchases.map((order) => order.id)
     );
+
+    if (user.email) {
+      const wallet = await getOrCreateWallet(supabase, user.email);
+      walletBalance = wallet?.balance ?? 0;
+    } else {
+      console.error("[wallet:profile] user.email is missing", { userId: user.id });
+    }
   }
 
   return (
@@ -47,7 +56,7 @@ export default async function ProfilePage() {
 
         {user ? (
           <div className="container relative mx-auto space-y-6 px-4 py-10 sm:space-y-8 sm:py-14">
-            <UserInfoCard user={user} />
+            <UserInfoCard user={user} balance={walletBalance} />
             <ProfileDashboard
               offers={offers}
               purchases={purchases}

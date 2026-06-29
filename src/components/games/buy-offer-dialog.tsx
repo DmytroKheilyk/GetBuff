@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { createOrder } from "@/lib/actions/create-order";
+import { notifyWalletChanged } from "@/lib/types/wallet";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,11 +33,13 @@ export function BuyOfferDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [chargedAmount, setChargedAmount] = useState<number | null>(null);
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setError(null);
       setSuccess(false);
+      setChargedAmount(null);
       setLoading(false);
     }
     onOpenChange(nextOpen);
@@ -56,7 +59,9 @@ export function BuyOfferDialog({
       return;
     }
 
+    setChargedAmount(result.chargedAmount ?? offer.price);
     setSuccess(true);
+    notifyWalletChanged();
   }
 
   return (
@@ -66,19 +71,26 @@ export function BuyOfferDialog({
           <>
             <DialogHeader>
               <DialogTitle className="text-lg font-black text-white">
-                Заказ{" "}
-                <span className="text-neon-gradient">успешно создан!</span>
+                Оплата{" "}
+                <span className="text-neon-gradient">прошла успешно!</span>
               </DialogTitle>
               <DialogDescription className="text-zinc-400">
-                Продавец уведомлён. Отслеживайте статус в личном кабинете →
-                «Мои покупки».
+                {chargedAmount !== null && (
+                  <>
+                    С вашего счета списано{" "}
+                    <span className="font-bold text-green-400">
+                      {formatPrice(chargedAmount)}
+                    </span>
+                    . Деньги заморожены до выполнения заказа.
+                  </>
+                )}
               </DialogDescription>
             </DialogHeader>
             {offer && (
               <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-4">
                 <p className="text-sm text-zinc-300">{offer.description}</p>
-                <p className="mt-2 text-lg font-black text-green-400">
-                  {formatPrice(offer.price)}
+                <p className="mt-2 text-xs text-zinc-500">
+                  Отслеживайте статус в личном кабинете → «Мои покупки»
                 </p>
               </div>
             )}
@@ -97,7 +109,7 @@ export function BuyOfferDialog({
                 <span className="text-neon-gradient">покупки</span>
               </DialogTitle>
               <DialogDescription className="text-zinc-500">
-                Вы действительно хотите оформить этот заказ?
+                Оплата спишется с вашего виртуального баланса GetBuff
               </DialogDescription>
             </DialogHeader>
 
@@ -140,10 +152,10 @@ export function BuyOfferDialog({
                 {loading ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
-                    Оформление...
+                    Проведение платежа...
                   </>
                 ) : (
-                  "Подтвердить"
+                  "Оплатить и купить"
                 )}
               </Button>
             </div>

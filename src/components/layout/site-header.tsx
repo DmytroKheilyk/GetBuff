@@ -6,7 +6,7 @@ import { HeaderAuth } from "@/components/layout/header-auth";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-900/60 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center gap-4 px-4 sm:gap-6">
+      <div className="container mx-auto flex h-16 items-center gap-3 px-4 sm:gap-6">
         <Link
           href="/"
           className="shrink-0 transition-opacity hover:opacity-90"
@@ -24,7 +24,7 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <HeaderAuth />
         </div>
       </div>

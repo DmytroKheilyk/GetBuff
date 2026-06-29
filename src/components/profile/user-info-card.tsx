@@ -1,14 +1,16 @@
 import type { User } from "@supabase/supabase-js";
-import { Calendar, Mail } from "lucide-react";
+import { Calendar, Mail, Wallet } from "lucide-react";
 
 import { formatUserRegisteredAt, getUserInitial } from "@/lib/user";
+import { formatWalletBalance } from "@/lib/types/wallet";
 import { cn } from "@/lib/utils";
 
 type UserInfoCardProps = {
   user: User;
+  balance: number;
 };
 
-export function UserInfoCard({ user }: UserInfoCardProps) {
+export function UserInfoCard({ user, balance }: UserInfoCardProps) {
   const registeredAt = formatUserRegisteredAt(user);
 
   return (
@@ -49,6 +51,21 @@ export function UserInfoCard({ user }: UserInfoCardProps) {
               </div>
             )}
           </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-green-500/25 bg-green-500/5 px-5 py-4 sm:items-end",
+            "shadow-[0_0_24px_rgba(34,197,94,0.12)]"
+          )}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <Wallet className="size-4 text-green-400/80" />
+            Баланс кошелька
+          </div>
+          <p className="text-2xl font-black tabular-nums text-green-400 drop-shadow-[0_0_12px_rgba(74,222,128,0.35)] sm:text-3xl">
+            {formatWalletBalance(balance)}
+          </p>
         </div>
       </div>
     </section>

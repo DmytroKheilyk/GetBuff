@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { AuthModal } from "@/components/auth/auth-modal";
+import { HeaderWallet } from "@/components/layout/header-wallet";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { getUserInitial } from "@/lib/user";
@@ -49,7 +50,8 @@ export function HeaderAuth() {
 
   if (user) {
     return (
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <HeaderWallet user={user} />
         <Link
           href="/profile"
           className={cn(
