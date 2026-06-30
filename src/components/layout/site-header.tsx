@@ -2,20 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Loader2,
-  MessageCircle,
-  Plus,
-  Search,
-} from "lucide-react";
+import { Loader2, MessageCircle, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCallback, useEffect, useState } from "react";
 
 import type { User } from "@supabase/supabase-js";
 
 import { AuthModal } from "@/components/auth/auth-modal";
+import { HeaderSearch } from "@/components/layout/header-search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { fetchWalletBalance } from "@/lib/actions/wallet";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -32,7 +27,6 @@ export function SiteHeader() {
   const [authOpen, setAuthOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const loadBalance = useCallback(async () => {
     if (!user) return;
@@ -87,16 +81,6 @@ export function SiteHeader() {
     action();
   }
 
-  function handleSearchSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = searchQuery.trim();
-    if (trimmed) {
-      router.push(`/?q=${encodeURIComponent(trimmed)}`);
-    } else {
-      router.push("/");
-    }
-  }
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -114,19 +98,7 @@ export function SiteHeader() {
           </div>
 
           {/* Центр: поиск */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="relative hidden max-w-xl flex-1 md:block"
-          >
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Поиск игр, ключей и услуг..."
-              className="h-10 rounded-2xl border-none bg-muted/50 pl-10 focus-visible:ring-1 focus-visible:ring-primary"
-            />
-          </form>
+          <HeaderSearch className="hidden max-w-xl flex-1 md:block" />
 
           {/* Правая часть */}
           <div className="flex shrink-0 items-center gap-2 sm:gap-4">
@@ -198,19 +170,9 @@ export function SiteHeader() {
         </div>
 
         {/* Поиск на мобильных */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className="relative border-t border-border/40 px-4 py-2 md:hidden"
-        >
-          <Search className="absolute top-1/2 left-7 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Поиск игр, ключей и услуг..."
-            className="h-10 rounded-2xl border-none bg-muted/50 pl-10 focus-visible:ring-1 focus-visible:ring-primary"
-          />
-        </form>
+        <div className="border-t border-border/40 px-4 py-2 md:hidden">
+          <HeaderSearch />
+        </div>
       </header>
 
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
