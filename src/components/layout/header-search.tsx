@@ -103,16 +103,26 @@ export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
     }
   }
 
-  const handleProductClick = useCallback((productId: string) => {
-    selectingProductRef.current = true;
+  const handleProductClick = useCallback(
+    (productId: string) => {
+      selectingProductRef.current = true;
 
-    if (outsideCloseTimerRef.current !== null) {
-      window.clearTimeout(outsideCloseTimerRef.current);
-      outsideCloseTimerRef.current = null;
-    }
+      if (outsideCloseTimerRef.current !== null) {
+        window.clearTimeout(outsideCloseTimerRef.current);
+        outsideCloseTimerRef.current = null;
+      }
 
-    window.location.assign(`/products/${productId}`);
-  }, []);
+      router.push(`/products/${productId}`);
+      setSearchQuery("");
+      setResults([]);
+      setIsDropdownOpen(false);
+
+      window.setTimeout(() => {
+        selectingProductRef.current = false;
+      }, OUTSIDE_CLOSE_DELAY_MS);
+    },
+    [router]
+  );
 
   const handleResultsMouseDown = useCallback(
     (event: React.MouseEvent<HTMLUListElement>) => {
