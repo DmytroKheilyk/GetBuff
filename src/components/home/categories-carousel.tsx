@@ -29,8 +29,8 @@ function CategoryIcon({ category }: { category: HomeCategory }) {
   return (
     <div
       className={cn(
-        "size-16 rounded-2xl border border-[#2a2d38] sm:size-20",
-        "shadow-[0_4px_16px_rgba(0,0,0,0.25)] transition-all duration-200",
+        "size-16 rounded-2xl border border-gray-200 dark:border-[#2a2d38] sm:size-20",
+        "shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-all duration-200 dark:shadow-[0_4px_16px_rgba(0,0,0,0.25)]",
         "group-hover/card:scale-105 group-hover/card:border-[#4f8cff]/30 group-hover/card:shadow-[0_0_24px_rgba(79,140,255,0.18)]"
       )}
     >
@@ -89,7 +89,7 @@ export function CategoriesCarousel() {
         onClick={() => scrollByStep("left")}
         className={cn(
           "absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-border",
-          "bg-background/80 p-2 text-white opacity-0 shadow-lg backdrop-blur",
+          "bg-background/80 p-2 text-foreground opacity-0 shadow-lg backdrop-blur",
           "transition-opacity group-hover/carousel:opacity-100 md:block"
         )}
       >
@@ -102,7 +102,7 @@ export function CategoriesCarousel() {
         onClick={() => scrollByStep("right")}
         className={cn(
           "absolute right-2 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-border",
-          "bg-background/80 p-2 text-white opacity-0 shadow-lg backdrop-blur",
+          "bg-background/80 p-2 text-foreground opacity-0 shadow-lg backdrop-blur",
           "transition-opacity group-hover/carousel:opacity-100 md:block"
         )}
       >
@@ -131,7 +131,7 @@ export function CategoriesCarousel() {
             <div className="mt-2 flex h-10 w-full items-start justify-center text-center">
               <p
                 className={cn(
-                  "line-clamp-2 max-w-[80px] text-xs font-medium text-white sm:max-w-[100px] sm:text-sm",
+                  "line-clamp-2 max-w-[80px] text-xs font-medium text-gray-900 dark:text-white sm:max-w-[100px] sm:text-sm",
                   "leading-tight"
                 )}
               >

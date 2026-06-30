@@ -5,18 +5,17 @@ import { useRouter } from "next/navigation";
 import {
   Loader2,
   MessageCircle,
-  Moon,
   Plus,
   Search,
-  Sun,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCallback, useEffect, useState } from "react";
+
 import type { User } from "@supabase/supabase-js";
 
 import { AuthModal } from "@/components/auth/auth-modal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { fetchWalletBalance } from "@/lib/actions/wallet";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -111,16 +110,7 @@ export function SiteHeader() {
             >
               GetBuff
             </Link>
-            <div className="hidden items-center gap-2 rounded-full bg-muted/50 p-1 px-2 sm:flex">
-              <Sun className="size-4 text-muted-foreground" />
-              <Switch
-                checked
-                disabled
-                aria-label="Тёмная тема активна"
-                className="data-[state=checked]:bg-primary"
-              />
-              <Moon className="size-4 text-primary" />
-            </div>
+            <ThemeToggle />
           </div>
 
           {/* Центр: поиск */}

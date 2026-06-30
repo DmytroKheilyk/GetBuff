@@ -1,7 +1,7 @@
 function PulseBlock({ className }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-2xl bg-[#23262f] ${className ?? ""}`}
+      className={`animate-pulse rounded-2xl bg-gray-200 dark:bg-[#23262f] ${className ?? ""}`}
     />
   );
 }

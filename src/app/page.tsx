@@ -23,7 +23,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const initialSearch = q?.trim() ?? "";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-white text-black dark:bg-[#181a21] dark:text-white">
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">

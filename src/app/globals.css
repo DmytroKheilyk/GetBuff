@@ -58,6 +58,37 @@
 
 :root {
   --radius: 0.75rem;
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #f3f4f6;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #4f8cff;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --destructive: #ef4444;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #4f8cff;
+  --chart-1: #4f8cff;
+  --chart-2: #6366f1;
+  --chart-3: #22c55e;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #4f8cff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f4f6;
+  --sidebar-accent-foreground: #111827;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #4f8cff;
 }
 
 .dark {
@@ -111,7 +142,7 @@
 
 @layer utilities {
   .glass-panel {
-    @apply rounded-2xl border border-[#2a2d38] bg-[#181a21]/90 backdrop-blur-md;
+    @apply rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-md dark:border-[#2a2d38] dark:bg-[#181a21]/90;
   }
 
   .neon-glow-hover {
