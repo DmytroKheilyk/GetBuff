@@ -10,11 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUser } from "@/context/user-context";
 import { createOrder } from "@/lib/actions/create-order";
-import { USE_MOCK_DATA } from "@/lib/mock-data";
+import { fetchWalletBalance } from "@/lib/actions/wallet";
+import { executeMockPurchase } from "@/lib/purchase-mock";
+import { MOCK_CHAT_BUYER_NAME, USE_MOCK_DATA } from "@/lib/mock-data";
+import { getMockWalletBalance } from "@/lib/mock-wallet-storage";
 import type { ProductOffer } from "@/lib/types/product-offer";
 import { notifyWalletChanged } from "@/lib/types/wallet";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type ProductPurchaseCardProps = {
   offer: ProductOffer;
@@ -34,6 +39,7 @@ export function ProductPurchaseCard({
   variant = "sidebar",
 }: ProductPurchaseCardProps) {
   const router = useRouter();
+  const { balance, updateBalance } = useUser();
   const [nickname, setNickname] = useState("");
   const [loading, setLoading] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
@@ -62,7 +68,7 @@ export function ProductPurchaseCard({
     return true;
   }
 
-  async function handleBuy() {
+  async function handlePurchase() {
     if (!nickname.trim()) {
       setError("Укажите игровой никнейм или логин");
       if (variant === "mobile-sheet") setExpanded(true);
@@ -74,6 +80,56 @@ export function ProductPurchaseCard({
 
     setError(null);
     setLoading(true);
+
+    if (USE_MOCK_DATA) {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setLoading(false);
+        setAuthOpen(true);
+        return;
+      }
+
+      const buyerName = user.email ?? MOCK_CHAT_BUYER_NAME;
+      let currentBalance = balance;
+
+      if (currentBalance === null) {
+        const storedBalance = getMockWalletBalance(buyerName);
+        if (storedBalance !== null) {
+          currentBalance = storedBalance;
+        } else {
+          const walletResult = await fetchWalletBalance();
+          currentBalance = walletResult.balance ?? 0;
+        }
+      }
+
+      const result = executeMockPurchase({
+        productId: offer.id,
+        price: offer.price,
+        buyerName,
+        currentBalance,
+      });
+
+      setLoading(false);
+
+      if (!result.success) {
+        if (result.error === "Недостаточно средств на балансе!") {
+          toast.error(result.error);
+        } else {
+          setError(result.error);
+        }
+        return;
+      }
+
+      updateBalance(result.newBalance);
+      toast.success("Товар успешно оплачен! Деньги депонированы.");
+      router.push(`/chats?product=${offer.id}`);
+      return;
+    }
 
     const result = await createOrder(offer.id);
     setLoading(false);
@@ -183,7 +239,7 @@ export function ProductPurchaseCard({
                 error={error}
                 loading={loading}
                 contactLoading={contactLoading}
-                onBuy={() => void handleBuy()}
+                onBuy={() => void handlePurchase()}
                 onContact={() => void handleContactSeller()}
                 onCollapse={() => setExpanded(false)}
                 showCollapse
@@ -212,7 +268,7 @@ export function ProductPurchaseCard({
             error={error}
             loading={loading}
             contactLoading={contactLoading}
-            onBuy={() => void handleBuy()}
+            onBuy={() => void handlePurchase()}
             onContact={() => void handleContactSeller()}
           />
         </CardContent>

@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const router = useRouter();
-  const { authUser: user, profile, loading } = useUser();
+  const { authUser: user, profile, balance: contextBalance, loading } = useUser();
   const [authOpen, setAuthOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
@@ -35,12 +35,19 @@ export function SiteHeader() {
   const loadBalance = useCallback(async () => {
     if (!user) return;
     setWalletLoading(true);
+
+    if (USE_MOCK_DATA && contextBalance !== null) {
+      setBalance(contextBalance);
+      setWalletLoading(false);
+      return;
+    }
+
     const result = await fetchWalletBalance();
     if (result.balance !== undefined) {
       setBalance(result.balance);
     }
     setWalletLoading(false);
-  }, [user]);
+  }, [user, contextBalance]);
 
   useEffect(() => {
     if (user) {
@@ -48,7 +55,7 @@ export function SiteHeader() {
     } else {
       setBalance(null);
     }
-  }, [user, loadBalance]);
+  }, [user, loadBalance, contextBalance]);
 
   useEffect(() => {
     function handleWalletChanged() {
