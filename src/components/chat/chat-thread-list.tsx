@@ -69,6 +69,7 @@ export function ChatThreadList({
           <ul className="py-2">
             {filteredThreads.map((thread) => {
               const isActive = thread.orderId === selectedOrderId;
+              const hasUnread = (thread.unreadCount ?? 0) > 0;
 
               return (
                 <li key={thread.orderId}>
@@ -94,9 +95,32 @@ export function ChatThreadList({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                            {thread.counterpartName}
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <p
+                              className={cn(
+                                "truncate text-sm text-neutral-900 dark:text-neutral-100",
+                                hasUnread ? "font-bold" : "font-semibold"
+                              )}
+                            >
+                              {thread.counterpartName}
+                            </p>
+                            {hasUnread && (
+                              <span
+                                className="size-2 shrink-0 rounded-full bg-[#4f8cff]"
+                                aria-label="Непрочитанные сообщения"
+                              />
+                            )}
+                          </div>
+                          {thread.productShortLabel ? (
+                            <p className="mt-0.5 truncate text-[11px] text-[#4f8cff]">
+                              {thread.productShortLabel}
+                            </p>
+                          ) : null}
+                          {thread.isArchived && (
+                            <Badge className="mt-1 border-0 bg-neutral-200 px-1.5 py-0 text-[10px] font-medium text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-800">
+                              Архив
+                            </Badge>
+                          )}
                           {thread.isOnline && (
                             <Badge className="mt-1 border-0 bg-[#22c55e]/15 px-1.5 py-0 text-[10px] font-semibold text-[#22c55e] hover:bg-[#22c55e]/15">
                               В сети
@@ -107,7 +131,14 @@ export function ChatThreadList({
                           {formatChatTime(thread.lastMessageAt)}
                         </span>
                       </div>
-                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                      <p
+                        className={cn(
+                          "mt-1 truncate text-xs",
+                          hasUnread
+                            ? "font-medium text-neutral-800 dark:text-neutral-200"
+                            : "text-muted-foreground"
+                        )}
+                      >
                         {truncatePreview(thread.lastMessagePreview)}
                       </p>
                     </div>

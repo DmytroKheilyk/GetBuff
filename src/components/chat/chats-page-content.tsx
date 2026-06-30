@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ChatConversationPanel } from "@/components/chat/chat-conversation-panel";
 import { ChatThreadList } from "@/components/chat/chat-thread-list";
+import {
+  buildMockThreads,
+  markMockChatAsRead,
+  MOCK_CHAT_READ_EVENT,
+} from "@/lib/mock-chat";
 import type { ChatThread } from "@/lib/types/chat";
 import { createClient } from "@/lib/supabase/client";
 import type { ChatMessage } from "@/lib/types/message";
@@ -14,13 +19,18 @@ type ChatsPageContentProps = {
   threads: ChatThread[];
   initialMessagesByOrder: Record<string, ChatMessage[]>;
   initialOrderId?: string | null;
+  currentUserName: string;
+  useMockChat?: boolean;
 };
 
 export function ChatsPageContent({
-  threads,
+  threads: initialThreads,
   initialMessagesByOrder,
   initialOrderId = null,
+  currentUserName,
+  useMockChat = false,
 }: ChatsPageContentProps) {
+  const [threads, setThreads] = useState(initialThreads);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(
     initialOrderId
   );
@@ -31,7 +41,7 @@ export function ChatsPageContent({
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null);
   const [threadPreviews, setThreadPreviews] = useState(() =>
     Object.fromEntries(
-      threads.map((thread) => [
+      initialThreads.map((thread) => [
         thread.orderId,
         {
           preview: thread.lastMessagePreview,
@@ -40,6 +50,24 @@ export function ChatsPageContent({
       ])
     )
   );
+
+  const refreshMockThreads = useCallback(() => {
+    if (!useMockChat) return;
+    setThreads(buildMockThreads(currentUserName));
+  }, [currentUserName, useMockChat]);
+
+  useEffect(() => {
+    setThreads(initialThreads);
+  }, [initialThreads]);
+
+  useEffect(() => {
+    if (!useMockChat) return;
+
+    refreshMockThreads();
+    window.addEventListener(MOCK_CHAT_READ_EVENT, refreshMockThreads);
+    return () =>
+      window.removeEventListener(MOCK_CHAT_READ_EVENT, refreshMockThreads);
+  }, [refreshMockThreads, useMockChat]);
 
   const sortedThreads = useMemo(() => {
     return [...threads].sort(
@@ -57,6 +85,7 @@ export function ChatsPageContent({
       (thread) =>
         thread.counterpartName.toLowerCase().includes(normalized) ||
         thread.offerDescription.toLowerCase().includes(normalized) ||
+        (thread.productShortLabel ?? "").toLowerCase().includes(normalized) ||
         (threadPreviews[thread.orderId]?.preview ?? thread.lastMessagePreview)
           .toLowerCase()
           .includes(normalized)
@@ -98,7 +127,14 @@ export function ChatsPageContent({
   }, [threads]);
 
   useEffect(() => {
+    if (initialOrderId) {
+      setSelectedOrderId(initialOrderId);
+    }
+  }, [initialOrderId]);
+
+  useEffect(() => {
     if (!selectedOrderId || messagesByOrder[selectedOrderId]) return;
+    if (useMockChat) return;
 
     let cancelled = false;
     setLoadingOrderId(selectedOrderId);
@@ -128,10 +164,15 @@ export function ChatsPageContent({
     return () => {
       cancelled = true;
     };
-  }, [selectedOrderId, messagesByOrder]);
+  }, [selectedOrderId, messagesByOrder, useMockChat]);
 
   function handleSelect(orderId: string) {
     setSelectedOrderId(orderId);
+
+    if (useMockChat) {
+      markMockChatAsRead(orderId);
+      refreshMockThreads();
+    }
   }
 
   function handleBack() {
@@ -147,6 +188,18 @@ export function ChatsPageContent({
       ...prev,
       [orderId]: { preview: content, at: createdAt },
     }));
+  }
+
+  function handleMockMessageSent(
+    orderId: string,
+    message: ChatMessage
+  ) {
+    setMessagesByOrder((prev) => ({
+      ...prev,
+      [orderId]: [...(prev[orderId] ?? []), message],
+    }));
+    handleMessageSent(orderId, message.content, message.createdAt);
+    refreshMockThreads();
   }
 
   return (
@@ -184,6 +237,8 @@ export function ChatsPageContent({
           showBackButton={mobileConversationOpen}
           onBack={handleBack}
           onMessageSent={handleMessageSent}
+          useMockChat={useMockChat}
+          onMockMessageSent={handleMockMessageSent}
         />
       </main>
     </div>

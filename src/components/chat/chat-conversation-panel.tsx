@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft, Loader2, Paperclip, Send } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, ExternalLink, Loader2, Paperclip, Send } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -16,7 +17,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   formatMessageTime,
   formatPrice,
-  getGamePosterSrc,
   getInitial,
 } from "@/lib/chat-ui";
 import {
@@ -31,6 +31,8 @@ import {
   type ChatMessage,
   type DbMessageRow,
 } from "@/lib/types/message";
+import { getHomeCategoryBySlug } from "@/lib/home-catalog";
+import { getMockProductById } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const messageInputClassName =
@@ -43,36 +45,84 @@ type ChatConversationPanelProps = {
   showBackButton: boolean;
   onBack: () => void;
   onMessageSent: (orderId: string, content: string, createdAt: string) => void;
+  useMockChat?: boolean;
+  onMockMessageSent?: (orderId: string, message: ChatMessage) => void;
 };
 
-function OfferMiniCard({ context }: { context: ChatContext }) {
-  const posterSrc = getGamePosterSrc(context.gameSlug);
+function ProductContextBar({ context }: { context: ChatContext }) {
+  const product = context.productId
+    ? getMockProductById(context.productId)
+    : null;
+  const category = product
+    ? getHomeCategoryBySlug(product.gameSlug)
+    : context.gameSlug
+      ? getHomeCategoryBySlug(context.gameSlug)
+      : undefined;
+
+  const productHref = context.productId
+    ? `/products/${context.productId}`
+    : null;
+
+  const title = product?.title ?? context.offerDescription;
+  const price = product?.price ?? context.offerPrice;
 
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-2.5 py-2 dark:border-border dark:bg-[#1c1e27]">
-      <div className="size-9 shrink-0 overflow-hidden rounded-lg border border-neutral-200 dark:border-border">
-        {posterSrc ? (
+    <div className="flex items-center gap-3 border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-[#14161d]">
+      <div className="size-10 shrink-0 overflow-hidden rounded-full border border-neutral-200 dark:border-neutral-700">
+        {product?.image ? (
           <CatalogImage
-            src={posterSrc}
-            alt={context.gameTitle}
-            fallbackClass="bg-neutral-200 dark:bg-[#2a2d38]"
-            fallbackText={context.gameTitle.slice(0, 2).toUpperCase()}
+            src={product.image}
+            alt={title}
+            fallbackClass={
+              category?.fallbackTileClass ??
+              "bg-neutral-200 dark:bg-[#2a2d38]"
+            }
+            fallbackText={category?.abbr ?? product.gameName.slice(0, 2)}
             fit="cover"
+            roundedClass="rounded-full"
+            className="size-full"
           />
         ) : (
-          <div className="flex size-full items-center justify-center bg-neutral-200 text-[10px] font-bold text-neutral-900 dark:bg-[#2a2d38] dark:text-neutral-100">
-            {context.gameTitle.slice(0, 2).toUpperCase()}
-          </div>
+          <CatalogImage
+            src={category?.imageSrc ?? ""}
+            alt={product?.gameName ?? context.gameTitle}
+            fallbackClass={
+              category?.fallbackTileClass ??
+              "bg-neutral-200 dark:bg-[#2a2d38]"
+            }
+            fallbackText={
+              category?.abbr ??
+              (product?.gameName ?? context.gameTitle).slice(0, 2)
+            }
+            fit="cover"
+            roundedClass="rounded-full"
+            className="size-full"
+          />
         )}
       </div>
-      <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-          {context.offerDescription}
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
+          {title}
         </p>
-        <p className="text-[11px] font-bold text-[#2563eb] dark:text-[#4f8cff]">
-          {formatPrice(context.offerPrice)}
+        <p className="text-sm font-semibold tabular-nums text-blue-500 dark:text-blue-400">
+          {formatPrice(price)}
         </p>
       </div>
+
+      {productHref && !context.isArchived ? (
+        <Link
+          href={productHref}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-blue-500 transition-colors hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-400/10"
+        >
+          Открыть лот
+          <ExternalLink className="size-3.5" />
+        </Link>
+      ) : (
+        <Badge variant="outline" className="shrink-0 text-muted-foreground">
+          {context.isArchived ? "Архив" : "Недоступен"}
+        </Badge>
+      )}
     </div>
   );
 }
@@ -84,6 +134,8 @@ export function ChatConversationPanel({
   showBackButton,
   onBack,
   onMessageSent,
+  useMockChat = false,
+  onMockMessageSent,
 }: ChatConversationPanelProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
@@ -114,7 +166,7 @@ export function ChatConversationPanel({
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (!thread) return;
+    if (!thread || useMockChat) return;
 
     const supabase = createClient();
     const channel = supabase
@@ -140,7 +192,7 @@ export function ChatConversationPanel({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [thread]);
+  }, [thread, useMockChat]);
 
   async function handleSend(e?: React.FormEvent) {
     e?.preventDefault();
@@ -151,6 +203,26 @@ export function ChatConversationPanel({
 
     setError(null);
     setSending(true);
+
+    if (useMockChat) {
+      const createdAt = new Date().toISOString();
+      const message: ChatMessage = {
+        id: `mock-msg-${Date.now()}`,
+        orderId: thread.orderId,
+        senderName: context.currentUserName,
+        content: text,
+        createdAt,
+        isRead: true,
+        type: "text",
+      };
+
+      setMessages((prev) => [...prev, message]);
+      setDraft("");
+      setSending(false);
+      onMockMessageSent?.(thread.orderId, message);
+      onMessageSent(thread.orderId, text, createdAt);
+      return;
+    }
 
     const supabase = createClient();
     const { data, error: insertError } = await supabase
@@ -233,15 +305,9 @@ export function ChatConversationPanel({
             </div>
           </div>
         </div>
-
-        <div className="hidden max-w-[220px] sm:block">
-          <OfferMiniCard context={context} />
-        </div>
       </div>
 
-      <div className="border-b border-neutral-200 px-4 py-2 dark:border-neutral-800 sm:hidden">
-        <OfferMiniCard context={context} />
-      </div>
+      <ProductContextBar context={context} />
 
       <ScrollArea className="flex-1 px-4 py-4">
         <div className="mx-auto max-w-3xl space-y-3">
@@ -257,6 +323,25 @@ export function ChatConversationPanel({
             </div>
           ) : (
             messages.map((message) => {
+              if (message.type === "system") {
+                return (
+                  <div
+                    key={message.id}
+                    className="my-4 flex w-full justify-center"
+                  >
+                    <p
+                      className={cn(
+                        "max-w-[92%] rounded-lg border px-4 py-2 text-center text-xs font-medium leading-relaxed",
+                        "bg-neutral-100 text-neutral-600 border-neutral-200",
+                        "dark:bg-[#1c1e27] dark:text-neutral-400 dark:border-neutral-800/60"
+                      )}
+                    >
+                      {message.content}
+                    </p>
+                  </div>
+                );
+              }
+
               const isOwn =
                 message.senderName === context.currentUserName;
 

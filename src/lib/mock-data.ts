@@ -1007,3 +1007,206 @@ export function resolveMockProductOffer(id: string): ProductOffer | null {
   if (!product) return null;
   return mockProductToProductOffer(product);
 }
+
+/** Текущий mock-покупатель для чатов (dima). */
+export const MOCK_CHAT_BUYER_NAME = "dima.kheilyk@gmail.com";
+
+export type MockChatMessageType = "text" | "system";
+
+export type MockChatMessage = {
+  id: string;
+  senderName: string;
+  content: string;
+  createdAt: string;
+  isRead: boolean;
+  type?: MockChatMessageType;
+};
+
+/** Алиас сообщения в mock-чатах. */
+export type Message = MockChatMessage;
+
+export type MockChat = {
+  id: string;
+  productId: string;
+  buyerName: string;
+  sellerName: string;
+  sellerId: string;
+  isArchived: boolean;
+  /** Полностью скрыть чат (например, удалённый товар без архивации). */
+  isHidden: boolean;
+  fallbackProductTitle?: string;
+  createdAt: string;
+  messages: MockChatMessage[];
+};
+
+/** Алиас для mock-чатов в UI и аналитике. */
+export type Chat = MockChat;
+
+export function countUnreadMockChatMessages(currentUserName: string): number {
+  return mockChats.reduce((total, chat) => {
+    if (chat.isHidden) return total;
+
+    return (
+      total +
+      chat.messages.filter(
+        (message) =>
+          message.type !== "system" &&
+          !message.isRead &&
+          message.senderName !== currentUserName
+      ).length
+    );
+  }, 0);
+}
+
+export const mockChats: MockChat[] = [
+  {
+    id: "chat-roblox-1",
+    productId: "prod-roblox-1",
+    buyerName: MOCK_CHAT_BUYER_NAME,
+    sellerName: "pala4.316@gmail.com",
+    sellerId: "user-pala4",
+    isArchived: false,
+    isHidden: false,
+    createdAt: "2026-03-20T10:00:00.000Z",
+    messages: [
+      {
+        id: "msg-roblox-1",
+        senderName: MOCK_CHAT_BUYER_NAME,
+        content: "Здравствуйте! Готов купить 1000 Robux через группу.",
+        createdAt: "2026-03-20T10:05:00.000Z",
+        isRead: true,
+        type: "text",
+      },
+      {
+        id: "sys-roblox-1",
+        senderName: "GetBuff",
+        content:
+          "🛒 Покупатель оплатил заказ. 850 ₽ заморожены на балансе GetBuff. Продавец, передайте товар.",
+        createdAt: "2026-03-20T10:06:00.000Z",
+        isRead: true,
+        type: "system",
+      },
+      {
+        id: "msg-roblox-2",
+        senderName: "pala4.316@gmail.com",
+        content: "Привет! Отправьте ник Roblox — выдам в течение 15 минут.",
+        createdAt: "2026-03-20T10:07:00.000Z",
+        isRead: false,
+        type: "text",
+      },
+      {
+        id: "msg-roblox-3",
+        senderName: "pala4.316@gmail.com",
+        content: "Если есть Game Pass — напишите, так быстрее.",
+        createdAt: "2026-03-20T10:08:00.000Z",
+        isRead: true,
+        type: "text",
+      },
+    ],
+  },
+  {
+    id: "chat-cs2-1",
+    productId: "prod-cs2-1",
+    buyerName: MOCK_CHAT_BUYER_NAME,
+    sellerName: "GamerPro",
+    sellerId: "user-gamerpro",
+    isArchived: false,
+    isHidden: false,
+    createdAt: "2026-03-18T14:00:00.000Z",
+    messages: [
+      {
+        id: "msg-cs2-1",
+        senderName: MOCK_CHAT_BUYER_NAME,
+        content: "Скин ещё в наличии? Готов обменять через трейд.",
+        createdAt: "2026-03-18T14:10:00.000Z",
+        isRead: true,
+        type: "text",
+      },
+      {
+        id: "sys-cs2-1",
+        senderName: "GetBuff",
+        content:
+          "🛒 Покупатель оплатил заказ. 1 850 ₽ заморожены на балансе GetBuff. Продавец, передайте товар.",
+        createdAt: "2026-03-18T14:12:00.000Z",
+        isRead: true,
+        type: "system",
+      },
+      {
+        id: "msg-cs2-2",
+        senderName: "GamerPro",
+        content: "Да, в наличии. Скин на hold 7 дней — это норм?",
+        createdAt: "2026-03-18T14:15:00.000Z",
+        isRead: true,
+        type: "text",
+      },
+      {
+        id: "msg-cs2-3",
+        senderName: MOCK_CHAT_BUYER_NAME,
+        content: "Да, подходит. Жду ссылку на трейд.",
+        createdAt: "2026-03-18T14:20:00.000Z",
+        isRead: true,
+        type: "text",
+      },
+      {
+        id: "sys-cs2-2",
+        senderName: "GetBuff",
+        content:
+          "✅ Сделка успешно завершена. Средства зачислены на ваш баланс.",
+        createdAt: "2026-03-18T14:25:00.000Z",
+        isRead: true,
+        type: "system",
+      },
+    ],
+  },
+  {
+    id: "chat-steam-1",
+    productId: "prod-steam-1",
+    buyerName: MOCK_CHAT_BUYER_NAME,
+    sellerName: "SteamKing",
+    sellerId: "user-steamking",
+    isArchived: false,
+    isHidden: false,
+    createdAt: "2026-03-22T09:00:00.000Z",
+    messages: [
+      {
+        id: "msg-steam-1",
+        senderName: "SteamKing",
+        content: "Ключ Steam готов. Активируется только в RU регионе.",
+        createdAt: "2026-03-22T09:12:00.000Z",
+        isRead: false,
+      },
+    ],
+  },
+  {
+    id: "chat-archived-1",
+    productId: "prod-deleted-demo",
+    buyerName: MOCK_CHAT_BUYER_NAME,
+    sellerName: "TopSeller99",
+    sellerId: "user-topseller",
+    isArchived: true,
+    isHidden: false,
+    fallbackProductTitle: "Discord Nitro 1 месяц",
+    createdAt: "2026-02-10T12:00:00.000Z",
+    messages: [
+      {
+        id: "msg-archived-1",
+        senderName: "TopSeller99",
+        content: "Товар снят с продажи. Спасибо за покупку!",
+        createdAt: "2026-02-12T16:00:00.000Z",
+        isRead: true,
+      },
+    ],
+  },
+  {
+    id: "chat-hidden-1",
+    productId: "prod-removed-hidden",
+    buyerName: MOCK_CHAT_BUYER_NAME,
+    sellerName: "PixelTrader",
+    sellerId: "user-pixel",
+    isArchived: true,
+    isHidden: true,
+    fallbackProductTitle: "Удалённый лот",
+    createdAt: "2026-01-05T08:00:00.000Z",
+    messages: [],
+  },
+];

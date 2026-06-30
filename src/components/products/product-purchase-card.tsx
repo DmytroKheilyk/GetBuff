@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createOrder } from "@/lib/actions/create-order";
+import { USE_MOCK_DATA } from "@/lib/mock-data";
 import type { ProductOffer } from "@/lib/types/product-offer";
 import { notifyWalletChanged } from "@/lib/types/wallet";
 import { cn } from "@/lib/utils";
@@ -90,6 +91,11 @@ export function ProductPurchaseCard({
   async function handleContactSeller() {
     const authed = await ensureAuth();
     if (!authed) return;
+
+    if (USE_MOCK_DATA) {
+      router.push(`/chats?product=${offer.id}`);
+      return;
+    }
 
     if (existingOrderId) {
       router.push(`/chats?order=${existingOrderId}`);

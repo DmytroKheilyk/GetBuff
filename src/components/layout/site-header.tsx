@@ -12,6 +12,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/context/user-context";
 import { fetchWalletBalance } from "@/lib/actions/wallet";
 import {
+  MOCK_CHAT_BUYER_NAME,
+  mockChats,
+  USE_MOCK_DATA,
+} from "@/lib/mock-data";
+import { getReadMessageIds, MOCK_CHAT_READ_EVENT } from "@/lib/mock-chat";
+import {
   formatWalletBalance,
   WALLET_CHANGED_EVENT,
 } from "@/lib/types/wallet";
@@ -24,6 +30,7 @@ export function SiteHeader() {
   const [authOpen, setAuthOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
 
   const loadBalance = useCallback(async () => {
     if (!user) return;
@@ -51,6 +58,40 @@ export function SiteHeader() {
     return () =>
       window.removeEventListener(WALLET_CHANGED_EVENT, handleWalletChanged);
   }, [loadBalance]);
+
+  useEffect(() => {
+    if (!USE_MOCK_DATA || !user) {
+      setUnreadChatCount(0);
+      return;
+    }
+
+    const updateUnreadCount = () => {
+      const userName = user.email ?? MOCK_CHAT_BUYER_NAME;
+      const readIds = getReadMessageIds();
+
+      const count = mockChats.reduce((total, chat) => {
+        if (chat.isHidden) return total;
+
+        return (
+          total +
+          chat.messages.filter(
+            (message) =>
+              message.type !== "system" &&
+              !message.isRead &&
+              message.senderName !== userName &&
+              !readIds.has(message.id)
+          ).length
+        );
+      }, 0);
+
+      setUnreadChatCount(count);
+    };
+
+    updateUnreadCount();
+    window.addEventListener(MOCK_CHAT_READ_EVENT, updateUnreadCount);
+    return () =>
+      window.removeEventListener(MOCK_CHAT_READ_EVENT, updateUnreadCount);
+  }, [user]);
 
   function requireAuth(action: () => void) {
     if (!user) {
@@ -101,8 +142,13 @@ export function SiteHeader() {
             >
               <MessageCircle className="size-6" />
               {user && (
-                <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                  2
+                <span
+                  className={cn(
+                    "absolute -top-1 -right-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground",
+                    unreadChatCount === 0 && "hidden"
+                  )}
+                >
+                  {unreadChatCount > 9 ? "9+" : unreadChatCount}
                 </span>
               )}
             </button>

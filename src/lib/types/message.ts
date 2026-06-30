@@ -1,9 +1,13 @@
+export type ChatMessageType = "text" | "system";
+
 export type ChatMessage = {
   id: string;
   orderId: string;
   senderName: string;
   content: string;
   createdAt: string;
+  isRead?: boolean;
+  type?: ChatMessageType;
 };
 
 export type DbMessageRow = {
