@@ -32,20 +32,20 @@ export function ProductPageView({
             />
 
             <div className="space-y-4">
-              <h1 className="text-2xl font-extrabold leading-tight text-[#e8eaef] sm:text-3xl">
+              <h1 className="text-2xl font-extrabold leading-tight text-neutral-900 dark:text-white sm:text-3xl">
                 {offer.description}
               </h1>
 
               <div className="flex flex-wrap gap-2">
                 <Badge
                   variant="outline"
-                  className="rounded-lg border-border bg-[#1c1e27] px-3 py-1 text-xs font-semibold text-[#e8eaef]"
+                  className="rounded-lg border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-800 dark:border-neutral-800 dark:bg-[#1c1e27] dark:text-neutral-100"
                 >
                   {offer.gameTitle}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="rounded-lg border-border bg-[#1c1e27] px-3 py-1 text-xs font-semibold text-[#e8eaef]"
+                  className="rounded-lg border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-800 dark:border-neutral-800 dark:bg-[#1c1e27] dark:text-neutral-100"
                 >
                   {categoryLabel}
                 </Badge>

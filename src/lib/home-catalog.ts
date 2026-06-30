@@ -311,3 +311,11 @@ export function filterDbGames(games: Game[], query: string): Game[] {
 export function formatPriceFrom(price: number): string {
   return `от ${price.toLocaleString("ru-RU")} ₽`;
 }
+
+export function formatProductPrice(price: number): string {
+  return `${price.toLocaleString("ru-RU")} ₽`;
+}
+
+export function getHomeCategoryBySlug(slug: string): HomeCategory | undefined {
+  return HOME_CATEGORIES.find((category) => category.slug === slug);
+}

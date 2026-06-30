@@ -137,12 +137,12 @@ export function ProductPurchaseCard({
   if (variant === "mobile-sheet") {
     return (
       <>
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-[#12131a]/95 backdrop-blur-lg">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-lg dark:border-neutral-800 dark:bg-[#12131a]/95">
           {!expanded ? (
             <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground">Цена</p>
-                <p className="text-xl font-black tabular-nums text-[#e8eaef]">
+                <p className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">
                   {formatPrice(offer.price)}
                 </p>
               </div>
@@ -157,7 +157,7 @@ export function ProductPurchaseCard({
                 type="button"
                 variant="outline"
                 size="icon"
-                className="shrink-0 rounded-xl border-border"
+                className="shrink-0 rounded-xl border-neutral-200 dark:border-neutral-800"
                 onClick={() => void handleContactSeller()}
                 aria-label="Написать продавцу"
               >
@@ -194,7 +194,7 @@ export function ProductPurchaseCard({
     <>
       <Card
         className={cn(
-          "overflow-hidden rounded-2xl border-border bg-[#1c1e27] shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
+          "overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-800 dark:bg-[#1c1e27] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
           className
         )}
       >
@@ -245,7 +245,9 @@ function PurchaseCardBody({
     <div className="space-y-5 p-5 sm:p-6">
       {showCollapse && (
         <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-[#e8eaef]">Оформление покупки</p>
+          <p className="text-sm font-bold text-neutral-900 dark:text-white">
+            Оформление покупки
+          </p>
           <Button
             type="button"
             variant="ghost"
@@ -262,13 +264,16 @@ function PurchaseCardBody({
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Цена
         </p>
-        <p className="mt-1 text-4xl font-black tabular-nums text-[#e8eaef]">
+        <p className="mt-1 text-4xl font-black tabular-nums text-neutral-900 dark:text-white">
           {formatPrice(offer.price)}
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="game-nickname" className="text-sm text-[#e8eaef]">
+        <Label
+          htmlFor="game-nickname"
+          className="text-sm text-neutral-900 dark:text-white"
+        >
           Игровой никнейм / логин
         </Label>
         <Input
@@ -276,7 +281,7 @@ function PurchaseCardBody({
           value={nickname}
           onChange={(e) => onNicknameChange(e.target.value)}
           placeholder="Например, Player123"
-          className="h-11 rounded-xl border-border bg-[#12131a] focus-visible:ring-primary/30"
+          className="h-11 rounded-xl border-neutral-200 bg-white text-neutral-900 placeholder:text-muted-foreground focus-visible:ring-primary/30 dark:border-neutral-800 dark:bg-[#12131a] dark:text-white"
         />
       </div>
 
@@ -308,7 +313,7 @@ function PurchaseCardBody({
           variant="outline"
           disabled={contactLoading}
           onClick={onContact}
-          className="h-11 w-full rounded-xl border-border bg-transparent text-[#e8eaef] hover:bg-[#12131a]"
+          className="h-11 w-full rounded-xl border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-transparent dark:text-neutral-100 dark:hover:bg-[#12131a]"
         >
           {contactLoading ? (
             <Loader2 className="size-4 animate-spin" />

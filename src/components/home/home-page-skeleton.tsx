@@ -22,9 +22,9 @@ export function HomePageSkeleton() {
 
       <section className="space-y-4">
         <PulseBlock className="h-6 w-44" />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <PulseBlock key={i} className="aspect-[4/5] sm:aspect-square" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <PulseBlock key={i} className="h-52 rounded-2xl" />
           ))}
         </div>
       </section>

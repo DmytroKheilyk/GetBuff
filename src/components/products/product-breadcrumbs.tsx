@@ -17,25 +17,30 @@ export function ProductBreadcrumbs({
       aria-label="Хлебные крошки"
       className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm"
     >
-      <Link href="/" className="transition-colors hover:text-[#e8eaef]">
+      <Link
+        href="/"
+        className="transition-colors hover:text-neutral-900 dark:hover:text-white"
+      >
         Главная
       </Link>
       <ChevronRight className="size-3.5 shrink-0 opacity-50" />
       <Link
         href={`/games/${gameSlug}`}
-        className="transition-colors hover:text-[#e8eaef]"
+        className="transition-colors hover:text-neutral-900 dark:hover:text-white"
       >
         Каталог
       </Link>
       <ChevronRight className="size-3.5 shrink-0 opacity-50" />
       <Link
         href={`/games/${gameSlug}`}
-        className="transition-colors hover:text-[#e8eaef]"
+        className="transition-colors hover:text-neutral-900 dark:hover:text-white"
       >
         {gameTitle}
       </Link>
       <ChevronRight className="size-3.5 shrink-0 opacity-50" />
-      <span className="font-medium text-[#e8eaef]">{categoryLabel}</span>
+      <span className="font-medium text-neutral-900 dark:text-white">
+        {categoryLabel}
+      </span>
     </nav>
   );
 }

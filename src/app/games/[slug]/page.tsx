@@ -50,13 +50,13 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   const gameTitle = getCatalogGameTitle(slug);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#181a21]">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-[#0e1015]">
       <SiteHeader />
       <main className="container mx-auto flex-1 px-4 py-8">
         <GamePageBreadcrumbs gameTitle={gameTitle} />
 
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#e8eaef] sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
             {gameTitle}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">

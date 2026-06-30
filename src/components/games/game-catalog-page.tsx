@@ -77,8 +77,8 @@ export function GameCatalogPage({
             className={cn(
               "rounded-full border px-4 py-2 text-sm font-semibold transition-all",
               activeFilter === filter.id
-                ? "border-[#4f8cff] bg-[#4f8cff]/15 text-[#e8eaef] shadow-[0_0_18px_rgba(79,140,255,0.15)]"
-                : "border-border bg-[#1c1e27] text-muted-foreground hover:border-[#4f8cff]/35 hover:text-[#e8eaef]"
+                ? "border-[#4f8cff] bg-[#4f8cff]/10 text-[#2563eb] shadow-sm dark:bg-[#4f8cff]/15 dark:text-white dark:shadow-[0_0_18px_rgba(79,140,255,0.15)]"
+                : "border-neutral-200 bg-neutral-100 text-neutral-800 hover:border-[#4f8cff]/35 dark:border-neutral-800 dark:bg-[#1c1e27] dark:text-muted-foreground dark:hover:text-white"
             )}
           >
             {filter.label}
@@ -87,8 +87,8 @@ export function GameCatalogPage({
       </div>
 
       {filteredOffers.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-[#1c1e27] px-6 py-16 text-center">
-          <p className="text-lg font-bold text-[#e8eaef]">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-16 text-center dark:border-neutral-800 dark:bg-[#1c1e27]">
+          <p className="text-lg font-bold text-neutral-900 dark:text-white">
             В этой категории пока нет активных объявлений
           </p>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">

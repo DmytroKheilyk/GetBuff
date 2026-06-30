@@ -51,7 +51,7 @@ export function ProductSellerCard({ offer }: ProductSellerCardProps) {
   );
 
   return (
-    <Card className="rounded-2xl border-border bg-[#1c1e27] shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
+    <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-800 dark:bg-[#1c1e27] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
       <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Avatar className="size-14 border-2 border-primary/30">
@@ -67,7 +67,7 @@ export function ProductSellerCard({ offer }: ProductSellerCardProps) {
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="truncate text-base font-bold text-[#e8eaef]">
+              <p className="truncate text-base font-bold text-neutral-900 dark:text-white">
                 {seller.nickname}
               </p>
               {seller.online && (
@@ -99,7 +99,7 @@ export function ProductSellerCard({ offer }: ProductSellerCardProps) {
         <Button
           asChild
           variant="outline"
-          className="shrink-0 rounded-xl border-border bg-transparent hover:bg-[#12131a]"
+          className="shrink-0 rounded-xl border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-transparent dark:text-neutral-100 dark:hover:bg-[#12131a]"
         >
           <Link
             href={`/games/${offer.gameSlug}?seller=${encodeURIComponent(seller.nickname)}`}

@@ -6,6 +6,10 @@ export type ProductOffer = Offer & {
   createdAt: string;
   completedDealsCount: number;
   deliveryLabel: string;
+  /** Полное описание для вкладки (если description — заголовок лота) */
+  detailsDescription?: string;
+  /** Кастомная инструкция «Как получить» */
+  instructionsText?: string;
 };
 
 export function formatDealsCount(count: number): string {

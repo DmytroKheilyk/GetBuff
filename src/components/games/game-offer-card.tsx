@@ -22,30 +22,30 @@ export function GameOfferCard({ offer, categoryLabel }: GameOfferCardProps) {
     <Link href={`/products/${offer.id}`} className="group block h-full">
       <Card
         className={cn(
-          "flex h-full flex-col rounded-2xl border-border bg-[#1c1e27] p-0",
-          "transition-all duration-300 hover:border-[#4f8cff]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+          "flex h-full flex-col rounded-2xl border border-neutral-200 bg-neutral-50 p-0 dark:border-neutral-800/50 dark:bg-[#1c1e27]",
+          "transition-all duration-300 hover:border-[#4f8cff]/30 hover:shadow-md dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
         )}
       >
-        <div className="border-b border-border p-4">
+        <div className="border-b border-neutral-200 p-4 dark:border-neutral-800/50">
           <div className="mb-3 flex items-start justify-between gap-3">
             <Badge
               variant="outline"
-              className="rounded-full border-border bg-[#12131a] text-[11px] text-[#e8eaef]"
+              className="rounded-full border-neutral-200 bg-white text-[11px] text-neutral-800 dark:border-neutral-700 dark:bg-[#12131a] dark:text-neutral-100"
             >
               {categoryLabel}
             </Badge>
-            <span className="text-lg font-black tabular-nums text-[#4f8cff]">
+            <span className="text-lg font-black tabular-nums text-[#2563eb] dark:text-[#4f8cff]">
               {formatPrice(offer.price)}
             </span>
           </div>
-          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-[#e8eaef] group-hover:text-[#6ba1ff]">
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900 group-hover:text-[#2563eb] dark:text-neutral-100 dark:group-hover:text-[#6ba1ff]">
             {preview}
           </h3>
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 p-4 pt-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-[#e8eaef]">
+            <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
               {offer.seller.nickname}
             </p>
             <SellerRatingDisplay
