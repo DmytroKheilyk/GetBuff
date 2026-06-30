@@ -25,6 +25,8 @@ export type MockUser = {
   rating: number;
   totalSales: number;
   status: MockUserStatus;
+  description: string;
+  createdAt: string;
   reviews?: MockReview[];
 };
 
@@ -63,6 +65,9 @@ export const mockUsers: MockUser[] = [
     rating: 4.9,
     totalSales: 34,
     status: "online",
+    description:
+      "Продаю валюту и аккаунты более 3-х лет. Быстрый ответ, честные сделки!",
+    createdAt: "май 2023",
     reviews: [
       {
         id: "rev-pala4-1",
@@ -87,6 +92,9 @@ export const mockUsers: MockUser[] = [
     rating: 4.7,
     totalSales: 12,
     status: "online",
+    description:
+      "Специализируюсь на CS2, Fortnite и мобильных играх. Всегда на связи в чате.",
+    createdAt: "январь 2024",
     reviews: [
       {
         id: "rev-gamerpro-1",
@@ -104,6 +112,9 @@ export const mockUsers: MockUser[] = [
     rating: 5.0,
     totalSales: 21,
     status: "offline",
+    description:
+      "Топовый продавец GetBuff: аккаунты, подписки и внутриигровая валюта с гарантией.",
+    createdAt: "август 2022",
     reviews: [
       {
         id: "rev-top-1",
@@ -128,6 +139,9 @@ export const mockUsers: MockUser[] = [
     rating: 4.8,
     totalSales: 8,
     status: "online",
+    description:
+      "Ключи Steam, пополнение кошелька и игровые аккаунты. Работаю только через GetBuff.",
+    createdAt: "март 2024",
     reviews: [
       {
         id: "rev-steam-1",
@@ -145,6 +159,9 @@ export const mockUsers: MockUser[] = [
     rating: 4.6,
     totalSales: 3,
     status: "offline",
+    description:
+      "Продаю V-Bucks, скины и игровую валюту. Отвечаю в течение нескольких часов.",
+    createdAt: "ноябрь 2025",
     reviews: [
       {
         id: "rev-pixel-1",
@@ -162,6 +179,9 @@ export const mockUsers: MockUser[] = [
     rating: 4.5,
     totalSales: 0,
     status: "online",
+    description:
+      "Новый продавец на площадке. Стараюсь быстро отвечать и честно описывать каждый лот.",
+    createdAt: "май 2025",
     reviews: [],
   },
 ];
@@ -902,6 +922,10 @@ export function getMockProductsByGameSlug(gameSlug: string): MockProduct[] {
   return mockProducts.filter((product) => product.gameSlug === gameSlug);
 }
 
+export function getMockProductsBySellerId(sellerId: string): MockProduct[] {
+  return mockProducts.filter((product) => product.sellerId === sellerId);
+}
+
 export function getMockOffersByGameSlug(gameSlug: string): ProductOffer[] {
   return getMockProductsByGameSlug(gameSlug)
     .map((product) => mockProductToProductOffer(product))
@@ -966,6 +990,7 @@ export function mockProductToProductOffer(
       ? "Моментально"
       : resolveDeliveryLabel(product.description, product.category),
     seller: {
+      id: seller.id,
       nickname: seller.name,
       avatarColor: seller.avatar,
       rating: seller.rating,

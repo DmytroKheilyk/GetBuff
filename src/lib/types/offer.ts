@@ -11,6 +11,7 @@ export const OFFER_CATEGORIES: {
 ];
 
 export type Seller = {
+  id?: string;
   nickname: string;
   avatarColor: string;
   /** Рейтинг из колонки offers (legacy) */

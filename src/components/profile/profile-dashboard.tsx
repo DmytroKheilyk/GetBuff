@@ -3,6 +3,7 @@
 import { MyOffersList } from "@/components/profile/my-offers-list";
 import { MyPurchasesList } from "@/components/profile/my-purchases-list";
 import { MySalesList } from "@/components/profile/my-sales-list";
+import { ProfileSecuritySettings } from "@/components/profile/profile-security-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProfileOffer } from "@/lib/queries/profile-offers";
 import type { Order } from "@/lib/types/order";
@@ -65,6 +66,12 @@ export function ProfileDashboard({
           Мои продажи
           <TabCountBadge count={sales.length} />
         </TabsTrigger>
+        <TabsTrigger
+          value="settings"
+          className="rounded-none px-4 pb-3 pt-2 text-sm font-medium text-muted-foreground data-active:text-neutral-900 dark:data-active:text-white"
+        >
+          Настройки и безопасность
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="listings" className="animate-in fade-in duration-300">
@@ -78,6 +85,9 @@ export function ProfileDashboard({
       </TabsContent>
       <TabsContent value="sales" className="animate-in fade-in duration-300">
         <MySalesList initialOrders={sales} />
+      </TabsContent>
+      <TabsContent value="settings" className="animate-in fade-in duration-300">
+        <ProfileSecuritySettings />
       </TabsContent>
     </Tabs>
   );

@@ -6,13 +6,11 @@ import { Loader2, MessageCircle, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCallback, useEffect, useState } from "react";
 
-import type { User } from "@supabase/supabase-js";
-
 import { AuthModal } from "@/components/auth/auth-modal";
 import { HeaderSearch } from "@/components/layout/header-search";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/context/user-context";
 import { fetchWalletBalance } from "@/lib/actions/wallet";
-import { createClient } from "@/lib/supabase/client";
 import {
   formatWalletBalance,
   WALLET_CHANGED_EVENT,
@@ -22,8 +20,7 @@ import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { authUser: user, profile, loading } = useUser();
   const [authOpen, setAuthOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
@@ -37,24 +34,6 @@ export function SiteHeader() {
     }
     setWalletLoading(false);
   }, [user]);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -81,11 +60,16 @@ export function SiteHeader() {
     action();
   }
 
+  const avatarInitial = profile?.nickname
+    ? profile.nickname.charAt(0).toUpperCase()
+    : user
+      ? getUserInitial(user)
+      : "?";
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between gap-3 md:gap-4">
-          {/* Левая часть: лого + переключатель темы */}
           <div className="flex shrink-0 items-center gap-4 md:gap-6">
             <Link
               href="/"
@@ -97,16 +81,12 @@ export function SiteHeader() {
             <ThemeToggle />
           </div>
 
-          {/* Центр: поиск */}
           <HeaderSearch className="hidden max-w-xl flex-1 md:block" />
 
-          {/* Правая часть */}
           <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             <button
               type="button"
-              onClick={() =>
-                requireAuth(() => router.push("/sell"))
-              }
+              onClick={() => requireAuth(() => router.push("/sell"))}
               className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
             >
               <Plus className="size-4" />
@@ -135,13 +115,19 @@ export function SiteHeader() {
                 className="flex items-center gap-3 rounded-full border border-border bg-muted/50 p-1 pr-3 transition-colors hover:bg-muted/70 sm:pr-4"
               >
                 <Avatar className="size-8 border-2 border-primary">
+                  {profile?.avatarBase64 ? (
+                    <AvatarImage
+                      src={profile.avatarBase64}
+                      alt={profile.nickname}
+                    />
+                  ) : null}
                   <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
-                    {getUserInitial(user)}
+                    {avatarInitial}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden flex-col sm:flex">
-                  <span className="text-[10px] leading-none text-muted-foreground">
-                    Профиль
+                  <span className="max-w-[120px] truncate text-[10px] leading-none text-muted-foreground">
+                    {profile?.nickname ?? "Профиль"}
                   </span>
                   <span className="text-sm leading-tight font-bold tabular-nums">
                     {walletLoading ? (
@@ -169,7 +155,6 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Поиск на мобильных */}
         <div className="border-t border-border/40 px-4 py-2 md:hidden">
           <HeaderSearch />
         </div>
