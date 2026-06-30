@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 type PopularProductCardProps = {
   product: PopularProductCardData;
+  className?: string;
 };
 
 function ProductPreview({ product }: { product: PopularProductCardData }) {
@@ -49,12 +50,15 @@ function ProductPreview({ product }: { product: PopularProductCardData }) {
   );
 }
 
-export function PopularProductCard({ product }: PopularProductCardProps) {
+export function PopularProductCard({ product, className }: PopularProductCardProps) {
   return (
-    <Link href={`/products/${product.id}`} className="group block">
+    <Link
+      href={`/products/${product.id}`}
+      className={cn("group block h-full", className)}
+    >
       <div
         className={cn(
-          "cursor-pointer rounded-2xl border border-neutral-200 bg-neutral-50 p-3",
+          "flex h-full cursor-pointer flex-col rounded-2xl border border-neutral-200 bg-neutral-50 p-3",
           "transition-all duration-200 hover:-translate-y-1 hover:shadow-md",
           "dark:border-neutral-800/40 dark:bg-[#1c1e27]"
         )}
@@ -83,14 +87,14 @@ export function PopularProductCard({ product }: PopularProductCardProps) {
           <ProductPreview product={product} />
         </div>
 
-        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <span className="text-base font-bold text-neutral-900 dark:text-white">
             {formatProductPrice(product.price)}
           </span>
           {product.instantDelivery && (
-            <span className="flex items-center gap-0.5 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-500">
-              <Zap className="size-3" />
-              Моментально
+            <span className="inline-flex max-w-full items-center gap-0.5 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-emerald-600 dark:text-emerald-500 sm:text-[11px]">
+              <Zap className="size-3 shrink-0" />
+              <span className="truncate">Моментально</span>
             </span>
           )}
         </div>

@@ -5,6 +5,10 @@ import { GamePageBreadcrumbs } from "@/components/games/game-page-breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getCatalogGameTitle } from "@/lib/game-slug";
+import {
+  getMockOffersByGameSlug,
+  USE_MOCK_DATA,
+} from "@/lib/mock-data";
 import { resolveGameForCatalog, fetchAllGamePageSlugs } from "@/lib/queries/game-page";
 import { fetchOffersByGameId } from "@/lib/queries/offers";
 
@@ -43,9 +47,13 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
     notFound();
   }
 
-  const offers = game.id
+  const dbOffers = game.id
     ? await fetchOffersByGameId(game.id, game.slug)
     : [];
+
+  const mockOffers = USE_MOCK_DATA ? getMockOffersByGameSlug(slug) : [];
+  const offers =
+    USE_MOCK_DATA && mockOffers.length > 0 ? mockOffers : dbOffers;
 
   const gameTitle = getCatalogGameTitle(slug);
 

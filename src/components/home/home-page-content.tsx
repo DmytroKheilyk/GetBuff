@@ -5,12 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 
 import { CategoriesCarousel } from "@/components/home/categories-carousel";
 import { HomePromoBanner } from "@/components/home/home-promo-banner";
-import { PopularProductCard } from "@/components/home/popular-product-card";
+import { PopularProductsCarousel } from "@/components/home/popular-products-carousel";
 import {
   filterMockProducts,
   toPopularProductCard,
   type MockProduct,
 } from "@/lib/mock-data";
+
+const POPULAR_PRODUCTS_LIMIT = 15;
 
 type HomePageContentProps = {
   initialSearch?: string;
@@ -27,10 +29,11 @@ export function HomePageContent({
     setQuery(initialSearch);
   }, [initialSearch]);
 
-  const filteredProducts = useMemo(
-    () => filterMockProducts(products, query),
-    [products, query]
-  );
+  const filteredProducts = useMemo(() => {
+    const filtered = filterMockProducts(products, query);
+    if (query.trim()) return filtered;
+    return products.slice(0, POPULAR_PRODUCTS_LIMIT);
+  }, [products, query]);
 
   const cardProducts = useMemo(
     () => filteredProducts.map(toPopularProductCard),
@@ -45,14 +48,18 @@ export function HomePageContent({
         <CategoriesCarousel />
       </section>
 
-      <section>
+      <section aria-label="Популярные товары" className="min-w-0">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-gray-900 dark:text-[#e8eaef] sm:text-xl">
             Популярные товары
           </h2>
-          {query.trim() && (
+          {query.trim() ? (
             <span className="text-xs text-gray-500 dark:text-[#8b9199]">
               Найдено: {cardProducts.length}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-500 dark:text-[#8b9199]">
+              Топ-{POPULAR_PRODUCTS_LIMIT}
             </span>
           )}
         </div>
@@ -68,11 +75,7 @@ export function HomePageContent({
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-            {cardProducts.map((product) => (
-              <PopularProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <PopularProductsCarousel products={cardProducts} />
         )}
       </section>
     </div>
