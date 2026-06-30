@@ -4,23 +4,23 @@ export type CategoryBadge = "new" | "hit";
 
 export type HomeCategory = {
   id: string;
+  slug: string;
   label: string;
-  subtitle?: string;
-  href: string;
   abbr: string;
   imageSrc: string;
   fallbackTileClass: string;
   badge?: CategoryBadge;
-  disabled?: boolean;
-  slug?: string | null;
 };
+
+export function getCategoryHref(slug: string): string {
+  return `/games/${slug}`;
+}
 
 export const HOME_CATEGORIES: HomeCategory[] = [
   {
     id: "steam",
+    slug: "steam",
     label: "Steam",
-    subtitle: "Ключи",
-    href: "/",
     abbr: "ST",
     imageSrc: "/home/categories/steam.png",
     fallbackTileClass:
@@ -29,43 +29,36 @@ export const HOME_CATEGORIES: HomeCategory[] = [
   },
   {
     id: "brawl-stars",
+    slug: "brawl-stars",
     label: "Brawl Stars",
-    subtitle: "Аккаунты",
-    href: "#",
     abbr: "BS",
     imageSrc: "/home/categories/brawlstars.png",
     fallbackTileClass:
       "bg-linear-to-br from-[#ffc83d] to-[#ff6b00] border border-orange-400/30",
     badge: "new",
-    disabled: true,
   },
   {
     id: "roblox",
-    label: "Roblox",
-    subtitle: "Робуксы",
-    href: "/games/roblox",
     slug: "roblox",
+    label: "Roblox",
     abbr: "RB",
     imageSrc: "/home/categories/roblox.png",
     fallbackTileClass: "bg-[#3a3a3a] border border-white/10",
+    badge: "hit",
   },
   {
     id: "genshin",
-    label: "Genshin",
-    subtitle: "Impact",
-    href: "#",
+    slug: "genshin",
+    label: "Genshin Impact",
     abbr: "GI",
     imageSrc: "/home/categories/genshin.png",
     fallbackTileClass:
       "bg-linear-to-br from-[#4c3d8f] to-[#2d2b42] border border-violet-400/20",
-    disabled: true,
   },
   {
     id: "cs2",
-    label: "CS2",
-    subtitle: "Скины",
-    href: "/games/cs2",
     slug: "cs2",
+    label: "CS2",
     abbr: "CS2",
     imageSrc: "/home/categories/cs2.svg",
     fallbackTileClass:
@@ -73,65 +66,135 @@ export const HOME_CATEGORIES: HomeCategory[] = [
   },
   {
     id: "gmod",
+    slug: "garrys-mod",
     label: "Garry's Mod",
-    href: "#",
     abbr: "GM",
     imageSrc: "/home/categories/gmod.svg",
     fallbackTileClass:
       "bg-linear-to-br from-[#1a1a2e] to-[#2563eb] border border-blue-400/20",
-    disabled: true,
   },
   {
     id: "mlbb",
-    label: "Mobile",
-    subtitle: "Legends",
-    href: "#",
+    slug: "mobile-legends",
+    label: "Mobile Legends",
     abbr: "ML",
     imageSrc: "/home/categories/mlbb.svg",
     fallbackTileClass:
       "bg-linear-to-br from-[#0a1628] to-[#be123c] border border-rose-400/20",
-    disabled: true,
   },
   {
     id: "playstation",
+    slug: "playstation",
     label: "PlayStation",
-    href: "#",
     abbr: "PS",
     imageSrc: "/home/categories/playstation.png",
     fallbackTileClass: "bg-[#003791] border border-blue-400/30",
-    disabled: true,
   },
   {
     id: "xbox",
+    slug: "xbox",
     label: "Xbox",
-    href: "#",
     abbr: "XB",
     imageSrc: "/home/categories/xbox.png",
     fallbackTileClass: "bg-[#107C10] border border-green-400/30",
-    disabled: true,
   },
   {
     id: "telegram",
-    label: "Telegram",
-    subtitle: "Premium",
-    href: "#",
+    slug: "telegram",
+    label: "Telegram Premium",
     abbr: "TG",
     imageSrc: "/home/categories/telegram.png",
     fallbackTileClass:
       "bg-linear-to-br from-[#229ED9] to-[#1a7fb5] border border-sky-300/30",
-    disabled: true,
   },
   {
     id: "gta-vi",
+    slug: "gta-6",
     label: "GTA VI",
-    subtitle: "Ключи",
-    href: "/games/gta-v",
-    slug: "gta-v",
     abbr: "VI",
     imageSrc: "/home/categories/gtavi.png",
     fallbackTileClass:
       "bg-linear-to-br from-[#f03067] to-[#f7941d] border border-pink-400/30",
     badge: "hit",
+  },
+  {
+    id: "discord-nitro",
+    slug: "discord-nitro",
+    label: "Discord Nitro",
+    abbr: "DN",
+    imageSrc: "/home/categories/discord-nitro.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#5865F2] to-[#3c45a5] border border-indigo-400/30",
+    badge: "new",
+  },
+  {
+    id: "pubg-mobile",
+    slug: "pubg-mobile",
+    label: "PUBG Mobile",
+    abbr: "PG",
+    imageSrc: "/home/categories/pubg-mobile.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#1a1a1a] to-[#f2a900] border border-amber-500/30",
+    badge: "new",
+  },
+  {
+    id: "fortnite",
+    slug: "fortnite",
+    label: "Fortnite",
+    abbr: "FN",
+    imageSrc: "/home/categories/fortnite.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#5b2c83] to-[#00d4ff] border border-violet-400/30",
+    badge: "hit",
+  },
+  {
+    id: "valorant",
+    slug: "valorant",
+    label: "Valorant",
+    abbr: "VAL",
+    imageSrc: "/home/categories/valorant.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#ff4655] to-[#0f1923] border border-rose-400/30",
+    badge: "new",
+  },
+  {
+    id: "free-fire",
+    slug: "free-fire",
+    label: "Free Fire",
+    abbr: "FF",
+    imageSrc: "/home/categories/free-fire.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#ff6b00] to-[#1a1a1a] border border-orange-500/30",
+    badge: "hit",
+  },
+  {
+    id: "league-of-legends",
+    slug: "league-of-legends",
+    label: "League of Legends",
+    abbr: "LoL",
+    imageSrc: "/home/categories/league-of-legends.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#0a1428] to-[#c89b3c] border border-amber-400/30",
+  },
+  {
+    id: "google-play",
+    slug: "google-play",
+    label: "Google Play",
+    abbr: "GP",
+    imageSrc: "/home/categories/google-play.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#34a853] via-[#4285f4] to-[#ea4335] border border-white/10",
+    badge: "new",
+  },
+  {
+    id: "app-store",
+    slug: "app-store",
+    label: "App Store",
+    abbr: "AS",
+    imageSrc: "/home/categories/app-store.svg",
+    fallbackTileClass:
+      "bg-linear-to-br from-[#0a84ff] to-[#1c1c1e] border border-sky-400/30",
+    badge: "new",
   },
 ];
 
@@ -156,7 +219,7 @@ const SHOWCASE_DEFS: Omit<ShowcaseGame, "listingsCount">[] = [
     title: "Counter-Strike 2",
     categoryLabel: "Скины",
     priceFrom: 120,
-    href: "/games/cs2",
+    href: getCategoryHref("cs2"),
     posterSrc: "/home/showcase/cs2.jpg",
     fallbackTileClass:
       "bg-linear-to-br from-[#141414] via-[#2a1500] to-[#e87500]",
@@ -168,7 +231,7 @@ const SHOWCASE_DEFS: Omit<ShowcaseGame, "listingsCount">[] = [
     title: "Dota 2",
     categoryLabel: "Скины",
     priceFrom: 89,
-    href: "/games/dota-2",
+    href: getCategoryHref("dota-2"),
     posterSrc: "/home/showcase/dota2.jpg",
     fallbackTileClass:
       "bg-linear-to-br from-[#1a0505] via-[#4a0a0a] to-[#8b0000]",
@@ -180,7 +243,7 @@ const SHOWCASE_DEFS: Omit<ShowcaseGame, "listingsCount">[] = [
     title: "Roblox",
     categoryLabel: "Робуксы",
     priceFrom: 45,
-    href: "/games/roblox",
+    href: getCategoryHref("roblox"),
     posterSrc: "/home/showcase/roblox.jpg",
     fallbackTileClass:
       "bg-linear-to-br from-[#2d2d2d] via-[#4a4a4a] to-[#1e3a5f]",
@@ -192,7 +255,7 @@ const SHOWCASE_DEFS: Omit<ShowcaseGame, "listingsCount">[] = [
     title: "Minecraft",
     categoryLabel: "Ключи",
     priceFrom: 299,
-    href: "#",
+    href: getCategoryHref("minecraft"),
     posterSrc: "/home/showcase/minecraft.jpg",
     fallbackTileClass:
       "bg-linear-to-br from-[#3d8b40] via-[#5cb85c] to-[#2d5a27]",
@@ -205,7 +268,7 @@ const SHOWCASE_DEFS: Omit<ShowcaseGame, "listingsCount">[] = [
     title: "Call of Duty",
     categoryLabel: "Аккаунты",
     priceFrom: 150,
-    href: "#",
+    href: getCategoryHref("call-of-duty"),
     posterSrc: "/home/showcase/cod.jpg",
     fallbackTileClass:
       "bg-linear-to-br from-[#1a1a1a] via-[#333] to-[#555]",

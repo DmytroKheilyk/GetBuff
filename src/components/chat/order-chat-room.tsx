@@ -11,7 +11,7 @@ import {
 import { OrderChatHeader } from "@/components/chat/order-chat-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { ChatContext } from "@/lib/queries/chat";
+import type { ChatContext } from "@/lib/types/chat";
 import { createClient } from "@/lib/supabase/client";
 import {
   mapDbMessage,

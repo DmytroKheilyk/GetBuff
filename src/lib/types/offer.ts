@@ -62,6 +62,11 @@ const CATEGORY_ALIASES: Record<string, OfferCategory> = {
   услуги: "boost",
   "буст / услуги": "boost",
   "буст/услуги": "boost",
+  keys: "items",
+  ключи: "items",
+  "ключи и коды": "items",
+  subscriptions: "boost",
+  подписки: "boost",
 };
 
 export function normalizeCategory(raw: string): OfferCategory | null {
@@ -81,11 +86,16 @@ export function matchesCategory(
 export function getCategoryDisplayLabel(raw: string): string {
   const normalized = normalizeCategory(raw);
   if (normalized) {
-    return (
-      OFFER_CATEGORIES.find((c) => c.id === normalized)?.label ?? raw
-    );
+    const label = OFFER_CATEGORIES.find((c) => c.id === normalized)?.label;
+    if (label) return label;
   }
-  return raw;
+
+  const customLabels: Record<string, string> = {
+    keys: "Ключи и коды",
+    subscriptions: "Подписки",
+  };
+
+  return customLabels[raw.trim().toLowerCase()] ?? raw;
 }
 
 const AVATAR_COLORS = [

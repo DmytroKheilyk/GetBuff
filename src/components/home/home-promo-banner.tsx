@@ -36,7 +36,7 @@ export function HomePromoBanner() {
           size="lg"
           className="mt-6 h-12 rounded-2xl bg-[#4f8cff] px-8 text-sm font-bold text-white shadow-[0_0_32px_rgba(79,140,255,0.45)] transition-all hover:bg-[#6ba1ff] hover:shadow-[0_0_40px_rgba(79,140,255,0.55)]"
         >
-          <Link href="/games/gta-v">Выбрать товар</Link>
+          <Link href="/games/gta-6">Выбрать товар</Link>
         </Button>
       </div>
     </Card>

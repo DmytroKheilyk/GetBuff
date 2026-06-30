@@ -18,11 +18,18 @@ import {
 type GameCatalogProps = {
   offers: Offer[];
   gameTitle: string;
+  initialSearch?: string;
+  initialCategory?: OfferCategory;
 };
 
-export function GameCatalog({ offers, gameTitle }: GameCatalogProps) {
-  const [category, setCategory] = useState<OfferCategory>("currency");
-  const [search, setSearch] = useState("");
+export function GameCatalog({
+  offers,
+  gameTitle,
+  initialSearch = "",
+  initialCategory = "currency",
+}: GameCatalogProps) {
+  const [category, setCategory] = useState<OfferCategory>(initialCategory);
+  const [search, setSearch] = useState(initialSearch);
   const [sort, setSort] = useState<SortOption>("default");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");

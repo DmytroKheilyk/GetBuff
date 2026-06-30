@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -79,9 +80,12 @@ export function OffersTable({ offers }: OffersTableProps) {
                 className="border-zinc-800/50 transition-colors duration-200 hover:bg-green-500/5"
               >
                 <TableCell className="max-w-md whitespace-normal">
-                  <p className="text-sm leading-relaxed text-zinc-200">
+                  <Link
+                    href={`/products/${offer.id}`}
+                    className="text-sm leading-relaxed text-zinc-200 transition-colors hover:text-primary"
+                  >
                     {offer.description}
-                  </p>
+                  </Link>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">

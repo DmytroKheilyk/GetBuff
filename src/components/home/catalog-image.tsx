@@ -12,6 +12,7 @@ type CatalogImageProps = {
   fallbackClass: string;
   fallbackText: string;
   fit?: "cover" | "contain";
+  roundedClass?: string;
 };
 
 export function CatalogImage({
@@ -22,6 +23,7 @@ export function CatalogImage({
   fallbackClass,
   fallbackText,
   fit = "cover",
+  roundedClass = "rounded-2xl",
 }: CatalogImageProps) {
   const [failed, setFailed] = useState(false);
 
@@ -29,7 +31,8 @@ export function CatalogImage({
     return (
       <div
         className={cn(
-          "flex size-full items-center justify-center",
+          "flex size-full items-center justify-center overflow-hidden",
+          roundedClass,
           fallbackClass,
           className
         )}
@@ -42,13 +45,14 @@ export function CatalogImage({
   }
 
   return (
-    <div className={cn("relative size-full overflow-hidden", className)}>
+    <div className={cn("relative size-full", className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         className={cn(
-          "size-full",
+          "size-full overflow-hidden",
+          roundedClass,
           fit === "contain" ? "object-contain p-2" : "object-cover",
           imgClassName
         )}

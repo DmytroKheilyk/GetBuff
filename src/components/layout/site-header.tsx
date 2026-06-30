@@ -143,7 +143,7 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={() =>
-                requireAuth(() => router.push("/offers/create"))
+                requireAuth(() => router.push("/sell"))
               }
               className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
             >
@@ -153,7 +153,7 @@ export function SiteHeader() {
 
             <button
               type="button"
-              onClick={() => requireAuth(() => router.push("/profile"))}
+              onClick={() => requireAuth(() => router.push("/chats"))}
               className="relative transition-colors hover:text-primary"
               aria-label="Чаты"
             >

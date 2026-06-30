@@ -5,7 +5,7 @@ import { ArrowLeft, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { ChatContext } from "@/lib/queries/chat";
+import type { ChatContext } from "@/lib/types/chat";
 import { CHAT_ORDER_STATUS_LABELS } from "@/lib/types/order";
 import { cn } from "@/lib/utils";
 

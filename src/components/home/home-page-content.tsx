@@ -3,7 +3,7 @@
 import { SearchX } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { GameCategoryScroll } from "@/components/home/game-category-scroll";
+import { CategoriesCarousel } from "@/components/home/categories-carousel";
 import { HomePromoBanner } from "@/components/home/home-promo-banner";
 import { ShowcaseGameCard } from "@/components/home/showcase-game-card";
 import {
@@ -38,8 +38,8 @@ export function HomePageContent({
     <div className="space-y-7 sm:space-y-9">
       <HomePromoBanner />
 
-      <section aria-label="Категории маркетплейса">
-        <GameCategoryScroll />
+      <section aria-label="Категории маркетплейса" className="min-w-0">
+        <CategoriesCarousel />
       </section>
 
       <section>

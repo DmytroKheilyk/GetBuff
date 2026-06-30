@@ -87,6 +87,7 @@ export async function createOrder(offerId: string): Promise<CreateOrderResult> {
   if (gameSlug) {
     revalidatePath(`/games/${gameSlug}`);
   }
+  revalidatePath(`/products/${offerId}`);
   revalidatePath("/profile");
 
   return { success: true, chargedAmount: price };

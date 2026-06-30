@@ -4,14 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase";
-import type { OfferCategory } from "@/lib/types/offer";
 import { getSellerName } from "@/lib/user";
 
-const VALID_CATEGORIES: OfferCategory[] = [
+const VALID_CATEGORIES = [
   "currency",
   "accounts",
   "items",
   "boost",
+  "keys",
+  "subscriptions",
 ];
 
 export type CreateOfferState = {
@@ -34,24 +35,45 @@ export async function createOffer(
 
   const gameId = formData.get("game_id")?.toString().trim();
   const category = formData.get("category")?.toString().trim();
+  const title = formData.get("title")?.toString().trim();
   const description = formData.get("description")?.toString().trim();
+  const instantDelivery = formData.get("instant_delivery") === "true";
   const priceRaw = formData.get("price")?.toString().trim();
 
-  if (!gameId || !category || !description || !priceRaw) {
+  if (!gameId || !category || !priceRaw) {
     return { error: "Заполните все обязательные поля" };
   }
 
-  if (!VALID_CATEGORIES.includes(category as OfferCategory)) {
+  if (!VALID_CATEGORIES.includes(category)) {
     return { error: "Некорректная категория" };
+  }
+
+  let fullDescription = "";
+
+  if (title) {
+    fullDescription = title;
+    if (instantDelivery && !title.toLowerCase().includes("момент")) {
+      fullDescription += " | Моментальная доставка";
+    }
+    if (description) {
+      fullDescription += `\n\n${description}`;
+    }
+  } else if (description) {
+    fullDescription = description;
+    if (instantDelivery && !fullDescription.toLowerCase().includes("момент")) {
+      fullDescription += " | Моментальная доставка";
+    }
+  } else {
+    return { error: "Заполните название или описание лота" };
+  }
+
+  if (fullDescription.length < 10) {
+    return { error: "Описание должно содержать минимум 10 символов" };
   }
 
   const price = Number(priceRaw);
   if (Number.isNaN(price) || price <= 0) {
     return { error: "Укажите корректную цену" };
-  }
-
-  if (description.length < 10) {
-    return { error: "Описание должно содержать минимум 10 символов" };
   }
 
   const { data: game, error: gameError } = await supabase
@@ -66,14 +88,18 @@ export async function createOffer(
 
   const sellerName = getSellerName(user);
 
-  const { error: insertError } = await supabase.from("offers").insert({
-    game_id: gameId,
-    seller_name: sellerName,
-    description,
-    price,
-    category,
-    is_online: true,
-  });
+  const { data: inserted, error: insertError } = await supabase
+    .from("offers")
+    .insert({
+      game_id: gameId,
+      seller_name: sellerName,
+      description: fullDescription,
+      price,
+      category,
+      is_online: true,
+    })
+    .select("id")
+    .single();
 
   if (insertError) {
     return { error: insertError.message };
@@ -82,5 +108,12 @@ export async function createOffer(
   revalidatePath(`/games/${game.slug}`);
   revalidatePath("/");
   revalidatePath("/profile");
+
+  const redirectTarget = formData.get("redirect_to")?.toString();
+  if (redirectTarget === "product" && inserted?.id) {
+    revalidatePath(`/products/${inserted.id}`);
+    redirect(`/products/${inserted.id}`);
+  }
+
   redirect(`/games/${game.slug}`);
 }
