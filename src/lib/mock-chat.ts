@@ -30,8 +30,7 @@ export function getReadMessageIds(): Set<string> {
   }
 }
 
-export function markMockChatAsRead(chatId: string) {
-  const chat = mockChats.find((item) => item.id === chatId);
+export function markMockChatAsRead(chat: MockChat | undefined) {
   if (!chat) return;
 
   const readIds = getReadMessageIds();
@@ -54,10 +53,13 @@ export function isMockMessageUnread(
   return !message.isRead;
 }
 
-export function countMockUnreadMessages(currentUserName: string): number {
+export function countMockUnreadMessages(
+  chats: MockChat[],
+  currentUserName: string
+): number {
   const readIds = getReadMessageIds();
 
-  return mockChats.reduce((total, chat) => {
+  return chats.reduce((total, chat) => {
     if (chat.isHidden) return total;
 
     return (
@@ -69,8 +71,8 @@ export function countMockUnreadMessages(currentUserName: string): number {
   }, 0);
 }
 
-export function getVisibleMockChats(): MockChat[] {
-  return mockChats.filter((chat) => {
+export function getVisibleMockChats(chats: MockChat[] = mockChats): MockChat[] {
+  return chats.filter((chat) => {
     if (chat.isHidden) return false;
 
     const product = getMockProductById(chat.productId);
@@ -80,14 +82,18 @@ export function getVisibleMockChats(): MockChat[] {
   });
 }
 
-export function getMockChatById(chatId: string): MockChat | undefined {
-  return mockChats.find((chat) => chat.id === chatId);
+export function getMockChatById(
+  chatId: string,
+  chats: MockChat[] = mockChats
+): MockChat | undefined {
+  return chats.find((chat) => chat.id === chatId);
 }
 
 export function getMockChatByProductId(
-  productId: string
+  productId: string,
+  chats: MockChat[] = mockChats
 ): MockChat | undefined {
-  return mockChats.find((chat) => chat.productId === productId && !chat.isHidden);
+  return chats.find((chat) => chat.productId === productId && !chat.isHidden);
 }
 
 export function createDraftMockChat(
@@ -174,23 +180,35 @@ export function mockChatToMessages(chat: MockChat): ChatMessage[] {
   }));
 }
 
-export function buildMockThreads(currentUserName: string): ChatThread[] {
-  return getVisibleMockChats()
+export function buildMockThreads(
+  currentUserName: string,
+  chats: MockChat[] = mockChats
+): ChatThread[] {
+  return getVisibleMockChats(chats)
     .map((chat) => mockChatToThread(chat, currentUserName))
     .filter((thread): thread is ChatThread => thread !== null);
 }
 
 export function buildInitialMockMessagesMap(
-  chatIds: string[]
+  chatIds: string[],
+  chats: MockChat[] = mockChats
 ): Record<string, ChatMessage[]> {
   const map: Record<string, ChatMessage[]> = {};
 
   for (const chatId of chatIds) {
-    const chat = getMockChatById(chatId);
+    const chat = getMockChatById(chatId, chats);
     if (chat) {
       map[chatId] = mockChatToMessages(chat);
     }
   }
 
   return map;
+}
+
+export function buildMockMessagesMap(
+  chats: MockChat[]
+): Record<string, ChatMessage[]> {
+  return Object.fromEntries(
+    chats.map((chat) => [chat.id, mockChatToMessages(chat)])
+  );
 }

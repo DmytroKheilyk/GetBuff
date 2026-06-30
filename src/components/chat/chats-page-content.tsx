@@ -9,6 +9,7 @@ import {
   markMockChatAsRead,
   MOCK_CHAT_READ_EVENT,
 } from "@/lib/mock-chat";
+import type { Chat } from "@/lib/mock-data";
 import type { ChatThread } from "@/lib/types/chat";
 import { createClient } from "@/lib/supabase/client";
 import type { ChatMessage } from "@/lib/types/message";
@@ -21,6 +22,9 @@ type ChatsPageContentProps = {
   initialOrderId?: string | null;
   currentUserName: string;
   useMockChat?: boolean;
+  mockMessagesByOrder?: Record<string, ChatMessage[]>;
+  mockChats?: Chat[];
+  onMockMessageSent?: (orderId: string, message: ChatMessage) => void;
 };
 
 export function ChatsPageContent({
@@ -29,6 +33,9 @@ export function ChatsPageContent({
   initialOrderId = null,
   currentUserName,
   useMockChat = false,
+  mockMessagesByOrder,
+  mockChats = [],
+  onMockMessageSent,
 }: ChatsPageContentProps) {
   const [threads, setThreads] = useState(initialThreads);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(
@@ -53,12 +60,17 @@ export function ChatsPageContent({
 
   const refreshMockThreads = useCallback(() => {
     if (!useMockChat) return;
-    setThreads(buildMockThreads(currentUserName));
-  }, [currentUserName, useMockChat]);
+    setThreads(buildMockThreads(currentUserName, mockChats));
+  }, [currentUserName, mockChats, useMockChat]);
 
   useEffect(() => {
     setThreads(initialThreads);
   }, [initialThreads]);
+
+  useEffect(() => {
+    if (!useMockChat || !mockMessagesByOrder) return;
+    setMessagesByOrder(mockMessagesByOrder);
+  }, [mockMessagesByOrder, useMockChat]);
 
   useEffect(() => {
     if (!useMockChat) return;
@@ -170,7 +182,8 @@ export function ChatsPageContent({
     setSelectedOrderId(orderId);
 
     if (useMockChat) {
-      markMockChatAsRead(orderId);
+      const chat = mockChats.find((item) => item.id === orderId);
+      markMockChatAsRead(chat);
       refreshMockThreads();
     }
   }
@@ -194,10 +207,7 @@ export function ChatsPageContent({
     orderId: string,
     message: ChatMessage
   ) {
-    setMessagesByOrder((prev) => ({
-      ...prev,
-      [orderId]: [...(prev[orderId] ?? []), message],
-    }));
+    onMockMessageSent?.(orderId, message);
     handleMessageSent(
       orderId,
       message.content.trim() || (message.image ? "📷 Изображение" : message.content),
@@ -234,7 +244,9 @@ export function ChatsPageContent({
           thread={selectedThread}
           initialMessages={
             selectedOrderId
-              ? (messagesByOrder[selectedOrderId] ?? [])
+              ? (mockMessagesByOrder?.[selectedOrderId] ??
+                messagesByOrder[selectedOrderId] ??
+                [])
               : []
           }
           loading={loadingOrderId === selectedOrderId}
