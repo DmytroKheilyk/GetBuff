@@ -150,7 +150,9 @@ export function mockChatToThread(
     offerPrice: product?.price ?? 0,
     gameTitle: product?.gameName ?? "",
     gameSlug: product?.gameSlug ?? "",
-    lastMessagePreview: lastMessage?.content ?? "Начните переписку по товару",
+    lastMessagePreview:
+      lastMessage?.content.trim() ||
+      (lastMessage?.image ? "📷 Изображение" : "Начните переписку по товару"),
     lastMessageAt: lastMessage?.createdAt ?? chat.createdAt,
     isOnline: seller?.status === "online",
     unreadCount,
@@ -168,6 +170,7 @@ export function mockChatToMessages(chat: MockChat): ChatMessage[] {
     createdAt: message.createdAt,
     isRead: message.isRead,
     type: message.type ?? "text",
+    image: message.image,
   }));
 }
 

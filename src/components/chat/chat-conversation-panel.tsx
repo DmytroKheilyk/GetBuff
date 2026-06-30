@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Loader2, Paperclip, Send } from "lucide-react";
+import { ArrowLeft, ExternalLink, ImageIcon, Loader2, Send } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -10,19 +10,15 @@ import {
 } from "react";
 
 import { CatalogImage } from "@/components/home/catalog-image";
+import { ChatMessageBubble } from "@/components/chat/chat-message-bubble";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  formatMessageTime,
   formatPrice,
   getInitial,
 } from "@/lib/chat-ui";
-import {
-  CHAT_PHISHING_WARNING_TEXT,
-  containsSuspiciousExternalLink,
-} from "@/lib/chat-link-safety";
 import {
   threadToChatContext,
   type ChatContext,
@@ -37,7 +33,6 @@ import {
 } from "@/lib/types/message";
 import { getHomeCategoryBySlug } from "@/lib/home-catalog";
 import { getMockProductById } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
 
 const messageInputClassName =
   "flex-1 rounded-xl border-neutral-200 bg-white text-neutral-900 placeholder:text-muted-foreground focus-visible:ring-primary/30 dark:border-border dark:bg-[#1c1e27] dark:text-white";
@@ -71,7 +66,7 @@ function ProductContextBar({ context }: { context: ChatContext }) {
   const price = product?.price ?? context.offerPrice;
 
   return (
-    <div className="flex items-center gap-3 border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-[#14161d]">
+    <div className="flex shrink-0 items-center gap-3 border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-[#14161d]">
       <div className="size-10 shrink-0 overflow-hidden rounded-full border border-neutral-200 dark:border-neutral-700">
         {product?.image ? (
           <CatalogImage
@@ -146,6 +141,7 @@ export function ChatConversationPanel({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const context = thread ? threadToChatContext(thread) : null;
 
@@ -259,6 +255,66 @@ export function ChatConversationPanel({
     }
   }
 
+  function sendMockMessage(message: ChatMessage) {
+    if (!thread) return;
+
+    setMessages((prev) => [...prev, message]);
+    onMockMessageSent?.(thread.orderId, message);
+    onMessageSent(
+      thread.orderId,
+      message.content.trim() || "📷 Изображение",
+      message.createdAt
+    );
+  }
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !context || !thread || !useMockChat) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Можно прикрепить только изображение");
+      e.target.value = "";
+      return;
+    }
+
+    setError(null);
+    setSending(true);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      if (typeof dataUrl !== "string") {
+        setError("Не удалось загрузить изображение");
+        setSending(false);
+        e.target.value = "";
+        return;
+      }
+
+      const createdAt = new Date().toISOString();
+      const message: ChatMessage = {
+        id: `mock-msg-${Date.now()}`,
+        orderId: thread.orderId,
+        senderName: context.currentUserName,
+        content: draft.trim(),
+        createdAt,
+        isRead: true,
+        type: "text",
+        image: dataUrl,
+      };
+
+      sendMockMessage(message);
+      setDraft("");
+      setSending(false);
+      e.target.value = "";
+    };
+    reader.onerror = () => {
+      setError("Не удалось загрузить изображение");
+      setSending(false);
+      e.target.value = "";
+    };
+    reader.readAsDataURL(file);
+  }
+
   if (!thread || !context) {
     return (
       <div className="hidden h-full flex-col items-center justify-center bg-white px-6 text-center dark:bg-[#111319] md:flex">
@@ -273,8 +329,8 @@ export function ChatConversationPanel({
   }
 
   return (
-    <div className="flex h-full flex-col bg-white dark:bg-[#111319]">
-      <div className="flex items-center gap-3 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+    <div className="flex h-full min-h-0 flex-col bg-white dark:bg-[#111319]">
+      <div className="flex shrink-0 items-center gap-3 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
         {showBackButton && (
           <Button
             type="button"
@@ -313,105 +369,50 @@ export function ChatConversationPanel({
 
       <ProductContextBar context={context} />
 
-      <ScrollArea className="flex-1 px-4 py-4">
-        <div className="mx-auto max-w-3xl space-y-3">
+      <ScrollArea className="min-h-0 flex-1">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-4 pb-6">
           {loading ? (
-            <div className="flex justify-center py-16">
+            <div className="flex w-full justify-center py-16">
               <Loader2 className="size-6 animate-spin text-muted-foreground" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="py-16 text-center">
+            <div className="w-full py-16 text-center">
               <p className="text-sm font-semibold text-muted-foreground">
                 Чат пуст — напишите первое сообщение
               </p>
             </div>
           ) : (
-            messages.map((message) => {
-              if (message.type === "system") {
-                return (
-                  <div
-                    key={message.id}
-                    className="my-4 flex w-full justify-center"
-                  >
-                    <p
-                      className={cn(
-                        "max-w-[92%] rounded-lg border px-4 py-2 text-center text-xs font-medium leading-relaxed",
-                        "bg-neutral-100 text-neutral-600 border-neutral-200",
-                        "dark:bg-[#1c1e27] dark:text-neutral-400 dark:border-neutral-800/60"
-                      )}
-                    >
-                      {message.content}
-                    </p>
-                  </div>
-                );
-              }
-
-              const isOwn =
-                message.senderName === context.currentUserName;
-              const hasSuspiciousLink = containsSuspiciousExternalLink(
-                message.content
-              );
-
-              return (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "flex",
-                    isOwn ? "justify-end" : "justify-start"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "max-w-[85%] rounded-2xl px-4 py-2.5 shadow-md sm:max-w-[70%]",
-                      isOwn
-                        ? "rounded-br-md bg-[#4f8cff] text-white"
-                        : "rounded-bl-md bg-neutral-100 text-black dark:bg-[#1c1e27] dark:text-white"
-                    )}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
-                    {hasSuspiciousLink && (
-                      <p
-                        className={cn(
-                          "mt-1 rounded-md border p-2 text-[11px] font-medium leading-tight",
-                          "bg-amber-50 text-amber-700 border-amber-200",
-                          "dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50"
-                        )}
-                      >
-                        {CHAT_PHISHING_WARNING_TEXT}
-                      </p>
-                    )}
-                    <p
-                      className={cn(
-                        "mt-1.5 text-[10px] tabular-nums",
-                        isOwn
-                          ? "text-white/70"
-                          : "text-neutral-500 dark:text-muted-foreground"
-                      )}
-                    >
-                      {formatMessageTime(message.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })
+            messages.map((message) => (
+              <ChatMessageBubble
+                key={message.id}
+                message={message}
+                isOwn={message.senderName === context.currentUserName}
+              />
+            ))
           )}
-          <div ref={bottomRef} />
+          <div ref={bottomRef} className="h-px w-full shrink-0" />
         </div>
       </ScrollArea>
 
-      <div className="border-t border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur-md dark:border-neutral-800 dark:bg-[#12131a]/95">
-        <form onSubmit={handleSend} className="mx-auto flex max-w-3xl gap-2">
+      <div className="shrink-0 border-t border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur-md dark:border-neutral-800 dark:bg-[#12131a]/95">
+        <form onSubmit={handleSend} className="mx-auto flex max-w-3xl items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            disabled
-            className="shrink-0 text-muted-foreground"
-            aria-label="Прикрепить скриншот"
+            disabled={!useMockChat || sending}
+            onClick={() => fileInputRef.current?.click()}
+            className="shrink-0 text-muted-foreground hover:text-neutral-900 dark:hover:text-neutral-100"
+            aria-label="Прикрепить изображение"
           >
-            <Paperclip className="size-5" />
+            <ImageIcon className="size-5" />
           </Button>
           <Input
             value={draft}

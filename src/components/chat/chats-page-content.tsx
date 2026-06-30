@@ -198,7 +198,11 @@ export function ChatsPageContent({
       ...prev,
       [orderId]: [...(prev[orderId] ?? []), message],
     }));
-    handleMessageSent(orderId, message.content, message.createdAt);
+    handleMessageSent(
+      orderId,
+      message.content.trim() || (message.image ? "📷 Изображение" : message.content),
+      message.createdAt
+    );
     refreshMockThreads();
   }
 

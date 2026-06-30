@@ -8,7 +8,19 @@ export type ChatMessage = {
   createdAt: string;
   isRead?: boolean;
   type?: ChatMessageType;
+  image?: string;
 };
+
+/** Алиас сообщения в UI чата. */
+export type Message = ChatMessage;
+
+export function getChatMessageType(message: ChatMessage): ChatMessageType {
+  return message.type ?? "text";
+}
+
+export function isSystemChatMessage(message: ChatMessage): boolean {
+  return getChatMessageType(message) === "system";
+}
 
 export type DbMessageRow = {
   id: string;
@@ -25,5 +37,6 @@ export function mapDbMessage(row: DbMessageRow): ChatMessage {
     senderName: row.sender_name,
     content: row.content,
     createdAt: row.created_at,
+    type: "text",
   };
 }

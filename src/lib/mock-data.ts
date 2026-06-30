@@ -1020,6 +1020,7 @@ export type MockChatMessage = {
   createdAt: string;
   isRead: boolean;
   type?: MockChatMessageType;
+  image?: string;
 };
 
 /** Алиас сообщения в mock-чатах. */
@@ -1101,6 +1102,16 @@ export const mockChats: MockChat[] = [
         createdAt: "2026-03-20T10:08:00.000Z",
         isRead: true,
         type: "text",
+      },
+      {
+        id: "msg-roblox-4",
+        senderName: "pala4.316@gmail.com",
+        content: "Вот скрин выдачи в Roblox:",
+        createdAt: "2026-03-20T10:09:30.000Z",
+        isRead: true,
+        type: "text",
+        image:
+          "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500",
       },
     ],
   },
