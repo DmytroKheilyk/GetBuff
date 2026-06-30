@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ProductPageView } from "@/components/products/product-page-view";
+import { UserProductPageClient } from "@/components/products/user-product-page-client";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import {
@@ -8,6 +9,7 @@ import {
   mockProductToProductOffer,
   USE_MOCK_DATA,
 } from "@/lib/mock-data";
+import { isUserMockProductId } from "@/lib/mock-offers-storage";
 import {
   fetchProductOfferById,
   fetchUserOrderIdForOffer,
@@ -47,6 +49,19 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
+
+  if (USE_MOCK_DATA && isUserMockProductId(id)) {
+    return (
+      <div className="flex min-h-screen flex-col bg-white dark:bg-[#0e1015]">
+        <SiteHeader />
+        <main className="flex-1">
+          <UserProductPageClient productId={id} />
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   const offer = await resolveOffer(id);
 
   if (!offer) {

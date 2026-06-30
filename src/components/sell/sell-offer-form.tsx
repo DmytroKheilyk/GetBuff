@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Check,
   ChevronRight,
@@ -9,6 +10,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useActionState, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { CatalogImage } from "@/components/home/catalog-image";
 import { Button } from "@/components/ui/button";
@@ -17,12 +19,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@/context/user-context";
 import {
   createOffer,
   type CreateOfferState,
 } from "@/lib/actions/create-offer";
 import type { Game } from "@/lib/games";
+import { mockUsers, USE_MOCK_DATA } from "@/lib/mock-data";
 import {
+  appendUserMockProduct,
+  createUserMockProduct,
+} from "@/lib/mock-offers-storage";
+import {
+  buildSellGames,
   calculateSellerIncome,
   formatRubles,
   PLATFORM_COMMISSION_RATE,
@@ -48,7 +57,15 @@ const sectionTitleClassName = "text-base font-bold text-foreground";
 
 const labelClassName = "text-sm text-foreground";
 
+function resolveSellerId(email: string | undefined): string {
+  if (!email) return mockUsers[0]!.id;
+  const seller = mockUsers.find((user) => user.name === email);
+  return seller?.id ?? mockUsers[0]!.id;
+}
+
 export function SellOfferForm({ games }: SellOfferFormProps) {
+  const router = useRouter();
+  const { authUser } = useUser();
   const [state, formAction, pending] = useActionState(
     createOffer,
     initialState
@@ -58,10 +75,15 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [instantDelivery, setInstantDelivery] = useState(true);
   const [price, setPrice] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [mockPending, setMockPending] = useState(false);
+
+  const sellGames = useMemo(() => buildSellGames(games), [games]);
 
   const gameId = useMemo(
-    () => resolveGameIdBySlug(selectedGameSlug, games),
-    [selectedGameSlug, games]
+    () => resolveGameIdBySlug(selectedGameSlug, sellGames),
+    [selectedGameSlug, sellGames]
   );
 
   const selectedCategoryOption = SELL_CATEGORY_OPTIONS.find(
@@ -76,7 +98,35 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
   const canSubmit =
     Boolean(gameId) &&
     selectedCategory.length > 0 &&
-    selectedGameSlug.length > 0;
+    selectedGameSlug.length > 0 &&
+    title.trim().length >= 5 &&
+    description.trim().length >= 10 &&
+    Number(price) > 0;
+
+  async function handleMockSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!canSubmit || !selectedCategoryOption || !gameId) return;
+
+    setMockPending(true);
+
+    const product = createUserMockProduct({
+      gameSlug: selectedGameSlug,
+      sellerId: resolveSellerId(authUser?.email),
+      title: title.trim(),
+      description: description.trim(),
+      categoryDb: selectedCategoryOption.dbCategory,
+      price: Number(price),
+      instantDelivery,
+    });
+
+    appendUserMockProduct(product);
+    setMockPending(false);
+    toast.success("Лот опубликован в каталоге GetBuff!");
+    router.push(`/products/${product.id}`);
+  }
+
+  const isSubmitting = USE_MOCK_DATA ? mockPending : pending;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8 pb-16 sm:py-10">
@@ -105,7 +155,11 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
         </p>
       </div>
 
-      <form action={formAction} className="space-y-6">
+      <form
+        action={USE_MOCK_DATA ? undefined : formAction}
+        onSubmit={USE_MOCK_DATA ? handleMockSubmit : undefined}
+        className="space-y-6"
+      >
         <input type="hidden" name="game_id" value={gameId ?? ""} />
         <input
           type="hidden"
@@ -135,22 +189,17 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {SELL_GAME_OPTIONS.map((game) => {
                 const isSelected = selectedGameSlug === game.slug;
-                const isAvailable = Boolean(
-                  resolveGameIdBySlug(game.slug, games)
-                );
 
                 return (
                   <button
                     key={game.id}
                     type="button"
-                    disabled={!isAvailable}
                     onClick={() => setSelectedGameSlug(game.slug)}
                     className={cn(
                       "group relative flex flex-col items-center gap-2 rounded-2xl border p-3 text-center transition-all",
                       isSelected
                         ? "border-[#4f8cff] bg-[#4f8cff]/10 shadow-[0_0_20px_rgba(79,140,255,0.18)]"
-                        : "border-gray-200 bg-white hover:border-[#4f8cff]/40 dark:border-border dark:bg-[#12131a] dark:hover:border-[#4f8cff]/40",
-                      !isAvailable && "cursor-not-allowed opacity-45"
+                        : "border-gray-200 bg-white hover:border-[#4f8cff]/40 dark:border-border dark:bg-[#12131a] dark:hover:border-[#4f8cff]/40"
                     )}
                   >
                     {isSelected && (
@@ -173,11 +222,6 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                       {game.subtitle && (
                         <p className="truncate text-[10px] text-muted-foreground">
                           {game.subtitle}
-                        </p>
-                      )}
-                      {!isAvailable && (
-                        <p className="mt-1 text-[10px] font-medium text-amber-400">
-                          Скоро
                         </p>
                       )}
                     </div>
@@ -240,6 +284,8 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                 name="title"
                 required
                 minLength={5}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="1000 Робуксов | Моментальный трансфер"
                 className={cn("h-11", fieldClassName)}
               />
@@ -255,6 +301,8 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                 required
                 minLength={10}
                 rows={6}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Подробно опишите состав лота, способ передачи, гарантии и сроки..."
                 className={cn("min-h-36 resize-y", fieldClassName)}
               />
@@ -332,10 +380,10 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
 
         <Button
           type="submit"
-          disabled={pending || !canSubmit}
+          disabled={isSubmitting || !canSubmit}
           className="h-12 w-full rounded-2xl bg-linear-to-r from-[#4f8cff] to-[#6ba1ff] text-base font-bold text-white shadow-[0_0_28px_rgba(79,140,255,0.35)] hover:from-[#6ba1ff] hover:to-[#8bb5ff] disabled:opacity-50"
         >
-          {pending ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="size-5 animate-spin" />
               Публикация...

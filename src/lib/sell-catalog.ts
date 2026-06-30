@@ -1,3 +1,9 @@
+import { CATALOG_GAME_SLUGS } from "@/lib/game-slug";
+import { HOME_CATEGORIES } from "@/lib/home-catalog";
+import { USE_MOCK_DATA } from "@/lib/mock-data";
+import type { Game } from "@/lib/types/game";
+import { getGameGradients } from "@/lib/types/game";
+
 export type SellGameOption = {
   id: string;
   slug: string;
@@ -16,107 +22,35 @@ export type SellCategoryOption = {
 
 export const PLATFORM_COMMISSION_RATE = 0.1;
 
-export const SELL_GAME_OPTIONS: SellGameOption[] = [
-  {
-    id: "gta-vi",
-    slug: "gta-v",
-    title: "GTA VI",
-    imageSrc: "/home/categories/gtavi.png",
-    fallbackClass: "bg-linear-to-br from-[#f03067] to-[#f7941d]",
-  },
-  {
-    id: "cs2",
-    slug: "cs2",
-    title: "Counter-Strike 2",
-    imageSrc: "/home/showcase/cs2.jpg",
-    fallbackClass: "bg-linear-to-br from-[#141414] to-[#e87500]",
-  },
-  {
-    id: "dota-2",
-    slug: "dota-2",
-    title: "Dota 2",
-    imageSrc: "/home/showcase/dota2.jpg",
-    fallbackClass: "bg-linear-to-br from-[#1a0505] to-[#8b0000]",
-  },
-  {
-    id: "roblox",
-    slug: "roblox",
-    title: "Roblox",
-    imageSrc: "/home/categories/roblox.png",
-    fallbackClass: "bg-[#3a3a3a]",
-  },
-  {
-    id: "brawl-stars",
-    slug: "brawl-stars",
-    title: "Brawl Stars",
-    imageSrc: "/home/categories/brawlstars.png",
-    fallbackClass: "bg-linear-to-br from-[#ffc83d] to-[#ff6b00]",
-  },
-  {
-    id: "genshin",
-    slug: "genshin",
-    title: "Genshin Impact",
-    imageSrc: "/home/categories/genshin.png",
-    fallbackClass: "bg-linear-to-br from-[#4c3d8f] to-[#2d2b42]",
-  },
-  {
-    id: "gmod",
-    slug: "gmod",
-    title: "Garry's Mod",
-    imageSrc: "/home/categories/gmod.svg",
-    fallbackClass: "bg-linear-to-br from-[#1a1a2e] to-[#2563eb]",
-  },
-  {
-    id: "mlbb",
-    slug: "mlbb",
-    title: "Mobile Legends",
-    imageSrc: "/home/categories/mlbb.svg",
-    fallbackClass: "bg-linear-to-br from-[#0a1628] to-[#be123c]",
-  },
-  {
-    id: "minecraft",
-    slug: "minecraft",
-    title: "Minecraft",
-    imageSrc: "/home/showcase/minecraft.jpg",
-    fallbackClass: "bg-linear-to-br from-[#3d8b40] to-[#2d5a27]",
-  },
-  {
-    id: "cod",
-    slug: "call-of-duty",
-    title: "Call of Duty",
-    imageSrc: "/home/showcase/cod.jpg",
-    fallbackClass: "bg-linear-to-br from-[#1a1a1a] to-[#555]",
-  },
-  {
-    id: "steam",
-    slug: "steam",
-    title: "Steam",
-    subtitle: "Ключи и пополнение",
-    imageSrc: "/home/categories/steam.png",
-    fallbackClass: "bg-linear-to-br from-[#1b3a5c] to-[#0d1b2a]",
-  },
-  {
-    id: "playstation",
-    slug: "playstation",
-    title: "PlayStation",
-    imageSrc: "/home/categories/playstation.png",
-    fallbackClass: "bg-[#003791]",
-  },
-  {
-    id: "xbox",
-    slug: "xbox",
-    title: "Xbox",
-    imageSrc: "/home/categories/xbox.png",
-    fallbackClass: "bg-[#107C10]",
-  },
-  {
-    id: "telegram",
-    slug: "telegram",
-    title: "Telegram Premium",
-    imageSrc: "/home/categories/telegram.png",
-    fallbackClass: "bg-linear-to-br from-[#229ED9] to-[#1a7fb5]",
-  },
-];
+export const MOCK_SELL_GAME_ID_PREFIX = "mock-game-";
+
+const SHOWCASE_IMAGES: Record<string, string> = {
+  cs2: "/home/showcase/cs2.jpg",
+  "dota-2": "/home/showcase/dota2.jpg",
+  roblox: "/home/showcase/roblox.jpg",
+  minecraft: "/home/showcase/minecraft.jpg",
+  "call-of-duty": "/home/showcase/cod.jpg",
+};
+
+export const SELL_GAME_OPTIONS: SellGameOption[] = Object.entries(
+  CATALOG_GAME_SLUGS
+).map(([slug, meta]) => {
+  const homeCategory = HOME_CATEGORIES.find((category) => category.slug === slug);
+
+  return {
+    id: slug,
+    slug,
+    title: meta.title,
+    subtitle: slug === "steam" ? "Ключи и пополнение" : undefined,
+    imageSrc:
+      homeCategory?.imageSrc ??
+      SHOWCASE_IMAGES[slug] ??
+      "/home/showcase/cs2.jpg",
+    fallbackClass:
+      homeCategory?.fallbackTileClass ??
+      "bg-linear-to-br from-neutral-300 to-neutral-500 dark:from-[#2a2d38] dark:to-[#14161d]",
+  };
+});
 
 export const SELL_CATEGORY_OPTIONS: SellCategoryOption[] = [
   {
@@ -157,6 +91,52 @@ export const SELL_CATEGORY_OPTIONS: SellCategoryOption[] = [
   },
 ];
 
+export function buildSellGames(dbGames: Game[]): Game[] {
+  const dbBySlug = new Map(dbGames.map((game) => [game.slug, game]));
+  const merged = new Map<string, Game>();
+
+  for (const option of SELL_GAME_OPTIONS) {
+    const catalogMeta = CATALOG_GAME_SLUGS[option.slug];
+    const dbSlug = catalogMeta?.dbSlug ?? option.slug;
+    const dbGame = dbBySlug.get(dbSlug);
+
+    if (dbGame) {
+      merged.set(option.slug, {
+        ...dbGame,
+        slug: option.slug,
+        title: option.title,
+      });
+      continue;
+    }
+
+    if (USE_MOCK_DATA) {
+      const { gradientFrom, gradientTo } = getGameGradients(dbSlug);
+      merged.set(option.slug, {
+        id: `${MOCK_SELL_GAME_ID_PREFIX}${option.slug}`,
+        title: option.title,
+        slug: option.slug,
+        imageUrl: option.imageSrc,
+        platform: null,
+        listingsCount: 0,
+        gradientFrom,
+        gradientTo,
+      });
+    }
+  }
+
+  if (!USE_MOCK_DATA) {
+    return Array.from(merged.values());
+  }
+
+  for (const game of dbGames) {
+    if (!Array.from(merged.values()).some((item) => item.id === game.id)) {
+      merged.set(game.slug, game);
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
 export function calculateSellerIncome(
   buyerPrice: number,
   commissionRate = PLATFORM_COMMISSION_RATE
@@ -171,8 +151,12 @@ export function formatRubles(amount: number): string {
 
 export function resolveGameIdBySlug(
   slug: string,
-  dbGames: { id: string; slug: string }[]
+  games: Game[]
 ): string | null {
-  const match = dbGames.find((game) => game.slug === slug);
+  const match = games.find((game) => game.slug === slug);
   return match?.id ?? null;
+}
+
+export function isMockSellGameId(gameId: string): boolean {
+  return gameId.startsWith(MOCK_SELL_GAME_ID_PREFIX);
 }

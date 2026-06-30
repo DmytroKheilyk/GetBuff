@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { GameOfferCard } from "@/components/games/game-offer-card";
 import type { Offer } from "@/lib/offers";
+import { USE_MOCK_DATA } from "@/lib/mock-data";
+import { getUserMockOffersByGameSlug } from "@/lib/mock-offers-storage";
 import {
   getCategoryDisplayLabel,
   matchesCategory,
@@ -47,11 +49,36 @@ function filterByTab(offers: Offer[], filter: GameFilterId): Offer[] {
 export function GameCatalogPage({
   gameTitle,
   gameSlug,
-  offers,
+  offers: initialOffers,
   initialSeller = "",
 }: GameCatalogPageProps) {
   const [activeFilter, setActiveFilter] = useState<GameFilterId>("all");
   const [sellerQuery] = useState(initialSeller);
+  const [offers, setOffers] = useState<Offer[]>(initialOffers);
+
+  useEffect(() => {
+    setOffers(initialOffers);
+  }, [initialOffers]);
+
+  useEffect(() => {
+    if (!USE_MOCK_DATA) return;
+
+    const userOffers = getUserMockOffersByGameSlug(gameSlug);
+    if (userOffers.length === 0) return;
+
+    setOffers((current) => {
+      const existingIds = new Set(current.map((offer) => offer.id));
+      const merged = [...current];
+
+      for (const offer of userOffers) {
+        if (!existingIds.has(offer.id)) {
+          merged.unshift(offer);
+        }
+      }
+
+      return merged;
+    });
+  }, [gameSlug, initialOffers]);
 
   const filteredOffers = useMemo(() => {
     let result = filterByTab(offers, activeFilter);
