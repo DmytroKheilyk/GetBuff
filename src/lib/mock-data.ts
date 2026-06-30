@@ -1174,6 +1174,16 @@ export const mockChats: MockChat[] = [
         content: "Ключ Steam готов. Активируется только в RU регионе.",
         createdAt: "2026-03-22T09:12:00.000Z",
         isRead: false,
+        type: "text",
+      },
+      {
+        id: "msg-steam-2",
+        senderName: "SteamKing",
+        content:
+          "Слушай, перейди в тг t.me/super_seller, там быстрее отвечу и скину скриншоты",
+        createdAt: "2026-03-22T09:14:00.000Z",
+        isRead: true,
+        type: "text",
       },
     ],
   },

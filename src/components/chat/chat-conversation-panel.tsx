@@ -20,6 +20,10 @@ import {
   getInitial,
 } from "@/lib/chat-ui";
 import {
+  CHAT_PHISHING_WARNING_TEXT,
+  containsSuspiciousExternalLink,
+} from "@/lib/chat-link-safety";
+import {
   threadToChatContext,
   type ChatContext,
   type ChatThread,
@@ -344,6 +348,9 @@ export function ChatConversationPanel({
 
               const isOwn =
                 message.senderName === context.currentUserName;
+              const hasSuspiciousLink = containsSuspiciousExternalLink(
+                message.content
+              );
 
               return (
                 <div
@@ -364,6 +371,17 @@ export function ChatConversationPanel({
                     <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                       {message.content}
                     </p>
+                    {hasSuspiciousLink && (
+                      <p
+                        className={cn(
+                          "mt-1 rounded-md border p-2 text-[11px] font-medium leading-tight",
+                          "bg-amber-50 text-amber-700 border-amber-200",
+                          "dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50"
+                        )}
+                      >
+                        {CHAT_PHISHING_WARNING_TEXT}
+                      </p>
+                    )}
                     <p
                       className={cn(
                         "mt-1.5 text-[10px] tabular-nums",
