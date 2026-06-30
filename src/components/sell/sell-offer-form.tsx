@@ -39,7 +39,14 @@ type SellOfferFormProps = {
 const initialState: CreateOfferState = {};
 
 const fieldClassName =
-  "rounded-xl border-border bg-[#12131a] focus-visible:ring-primary/30";
+  "rounded-xl border border-gray-200 bg-gray-50 text-neutral-900 placeholder:text-muted-foreground focus-visible:ring-primary/30 dark:border-border dark:bg-[#1c1e27] dark:text-neutral-100";
+
+const cardClassName =
+  "rounded-2xl border border-gray-200 bg-gray-50 shadow-sm dark:border-border dark:bg-[#1c1e27] dark:shadow-[0_4px_24px_rgba(0,0,0,0.25)]";
+
+const sectionTitleClassName = "text-base font-bold text-foreground";
+
+const labelClassName = "text-sm text-foreground";
 
 export function SellOfferForm({ games }: SellOfferFormProps) {
   const [state, formAction, pending] = useActionState(
@@ -77,19 +84,19 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
         aria-label="Хлебные крошки"
         className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground sm:text-sm"
       >
-        <Link href="/" className="transition-colors hover:text-[#e8eaef]">
+        <Link href="/" className="transition-colors hover:text-foreground">
           Главная
         </Link>
         <ChevronRight className="size-3.5 opacity-50" />
-        <Link href="/profile" className="transition-colors hover:text-[#e8eaef]">
+        <Link href="/profile" className="transition-colors hover:text-foreground">
           Панель продавца
         </Link>
         <ChevronRight className="size-3.5 opacity-50" />
-        <span className="font-medium text-[#e8eaef]">Создать лот</span>
+        <span className="font-medium text-foreground">Создать лот</span>
       </nav>
 
       <div className="mb-8">
-        <h1 className="text-2xl font-extrabold text-[#e8eaef] sm:text-3xl">
+        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">
           Выставить товар на продажу
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -118,9 +125,9 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
           </p>
         )}
 
-        <Card className="rounded-2xl border-border bg-[#1c1e27] shadow-[0_4px_24px_rgba(0,0,0,0.25)]">
+        <Card className={cardClassName}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-[#e8eaef]">
+            <CardTitle className={sectionTitleClassName}>
               1. Игра или сервис
             </CardTitle>
           </CardHeader>
@@ -142,7 +149,7 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                       "group relative flex flex-col items-center gap-2 rounded-2xl border p-3 text-center transition-all",
                       isSelected
                         ? "border-[#4f8cff] bg-[#4f8cff]/10 shadow-[0_0_20px_rgba(79,140,255,0.18)]"
-                        : "border-border bg-[#12131a] hover:border-[#4f8cff]/40",
+                        : "border-gray-200 bg-white hover:border-[#4f8cff]/40 dark:border-border dark:bg-[#12131a] dark:hover:border-[#4f8cff]/40",
                       !isAvailable && "cursor-not-allowed opacity-45"
                     )}
                   >
@@ -160,7 +167,7 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-semibold text-[#e8eaef] sm:text-sm">
+                      <p className="truncate text-xs font-semibold text-foreground sm:text-sm">
                         {game.title}
                       </p>
                       {game.subtitle && (
@@ -181,9 +188,9 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border bg-[#1c1e27] shadow-[0_4px_24px_rgba(0,0,0,0.25)]">
+        <Card className={cardClassName}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-[#e8eaef]">
+            <CardTitle className={sectionTitleClassName}>
               2. Категория товара
             </CardTitle>
           </CardHeader>
@@ -201,10 +208,10 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
                       "rounded-2xl border p-4 text-left transition-all",
                       isSelected
                         ? "border-[#4f8cff] bg-[#4f8cff]/10 shadow-[0_0_18px_rgba(79,140,255,0.15)]"
-                        : "border-border bg-[#12131a] hover:border-[#4f8cff]/35"
+                        : "border-gray-200 bg-white hover:border-[#4f8cff]/35 dark:border-border dark:bg-[#12131a] dark:hover:border-[#4f8cff]/35"
                     )}
                   >
-                    <p className="text-sm font-bold text-[#e8eaef]">
+                    <p className="text-sm font-bold text-foreground">
                       {category.label}
                     </p>
                     <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -217,15 +224,15 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border bg-[#1c1e27] shadow-[0_4px_24px_rgba(0,0,0,0.25)]">
+        <Card className={cardClassName}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-[#e8eaef]">
+            <CardTitle className={sectionTitleClassName}>
               3. Описание и детали лота
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm text-[#e8eaef]">
+              <Label htmlFor="title" className={labelClassName}>
                 Название объявления
               </Label>
               <Input
@@ -239,7 +246,7 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm text-[#e8eaef]">
+              <Label htmlFor="description" className={labelClassName}>
                 Описание товара
               </Label>
               <Textarea
@@ -253,11 +260,11 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-[#12131a] p-4">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-border dark:bg-[#12131a]">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Zap className="size-4 text-[#22c55e]" />
-                  <p className="text-sm font-semibold text-[#e8eaef]">
+                  <p className="text-sm font-semibold text-foreground">
                     Моментальная выдача
                   </p>
                 </div>
@@ -281,15 +288,15 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border bg-[#1c1e27] shadow-[0_4px_24px_rgba(0,0,0,0.25)]">
+        <Card className={cardClassName}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-[#e8eaef]">
+            <CardTitle className={sectionTitleClassName}>
               4. Стоимость и расчёт дохода
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="price" className="text-sm text-[#e8eaef]">
+              <Label htmlFor="price" className={labelClassName}>
                 Цена для покупателя (в ₽)
               </Label>
               <Input
@@ -309,13 +316,13 @@ export function SellOfferForm({ games }: SellOfferFormProps) {
             <div className="rounded-2xl border border-[#4f8cff]/20 bg-[#4f8cff]/5 p-4">
               <p className="text-sm text-muted-foreground">
                 Комиссия площадки:{" "}
-                <span className="font-semibold text-[#e8eaef]">
+                <span className="font-semibold text-foreground">
                   {Math.round(PLATFORM_COMMISSION_RATE * 100)}%
                 </span>
               </p>
-              <p className="mt-2 text-base font-bold text-[#e8eaef]">
+              <p className="mt-2 text-base font-bold text-neutral-900 dark:text-neutral-100">
                 Вы получите на баланс:{" "}
-                <span className="text-[#4f8cff]">
+                <span className="text-[#2563eb] dark:text-primary">
                   {formatRubles(sellerIncome)}
                 </span>
               </p>

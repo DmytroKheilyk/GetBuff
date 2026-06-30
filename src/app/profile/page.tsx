@@ -49,10 +49,10 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-white text-foreground dark:bg-[#0e1015]">
       <SiteHeader />
       <main className="relative flex-1">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,197,94,0.1),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(79,140,255,0.06),transparent_55%)]" />
 
         {user ? (
           <div className="container relative mx-auto space-y-6 px-4 py-10 sm:space-y-8 sm:py-14">

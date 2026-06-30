@@ -150,10 +150,10 @@ export function ChatsPageContent({
   }
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] overflow-hidden border-t border-border">
+    <div className="flex h-[calc(100dvh-4rem)] overflow-hidden border-t border-neutral-200 dark:border-neutral-800">
       <aside
         className={cn(
-          "h-full w-full shrink-0 border-r border-border md:w-1/3 md:max-w-sm lg:max-w-md",
+          "h-full w-full shrink-0 border-r border-neutral-200 dark:border-neutral-800 md:w-1/3 md:max-w-sm lg:max-w-md",
           mobileConversationOpen ? "hidden md:block" : "block"
         )}
       >

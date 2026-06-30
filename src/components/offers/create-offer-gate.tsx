@@ -15,7 +15,7 @@ export function CreateOfferGate() {
         <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full border border-green-500/30 bg-green-500/10 shadow-[0_0_30px_rgba(34,197,94,0.15)]">
           <PackageOpen className="size-8 text-green-400" />
         </div>
-        <h1 className="text-2xl font-black text-white">
+        <h1 className="text-2xl font-black text-foreground">
           Продажа доступна{" "}
           <span className="text-neon-gradient">авторизованным</span>
         </h1>

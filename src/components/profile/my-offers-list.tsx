@@ -19,7 +19,10 @@ type MyOffersListProps = {
 };
 
 const fieldClassName =
-  "h-8 border-zinc-800/80 bg-black/40 focus-visible:border-green-500/40 focus-visible:ring-green-500/20";
+  "h-9 w-28 rounded-xl border border-neutral-200 bg-gray-50 text-neutral-900 focus-visible:ring-primary/30 dark:border-border dark:bg-[#1c1e27] dark:text-neutral-100";
+
+const primaryButtonClassName =
+  "rounded-2xl bg-linear-to-r from-[#4f8cff] to-[#6ba1ff] font-bold text-white shadow-[0_0_28px_rgba(79,140,255,0.35)] hover:from-[#6ba1ff] hover:to-[#8bb5ff]";
 
 function formatPrice(price: number): string {
   return `${price.toLocaleString("ru-RU")} ₽`;
@@ -97,16 +100,15 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
 
   if (offers.length === 0) {
     return (
-      <section className="glass-panel rounded-2xl p-8 text-center">
-        <p className="text-lg font-bold text-white">У вас пока нет лотов</p>
-        <p className="mt-2 text-sm text-zinc-500">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-[#14161d]">
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">
+          У вас пока нет лотов
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
           Выставите первый товар — он сразу появится в каталоге игры
         </p>
-        <Button
-          asChild
-          className="neon-glow-hover mt-6 border border-green-500/30 bg-green-500 font-bold text-black hover:bg-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.45)]"
-        >
-          <Link href="/offers/create">
+        <Button asChild className={cn("mt-6 h-11", primaryButtonClassName)}>
+          <Link href="/sell">
             <Plus className="size-4" />
             Выставить первый товар
           </Link>
@@ -116,24 +118,14 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
   }
 
   return (
-    <section className="glass-panel overflow-hidden rounded-2xl">
-      <div className="border-b border-zinc-800/80 px-6 py-5">
-        <h2 className="text-lg font-black text-white">
-          Мои лоты{" "}
-          <span className="text-neon-gradient">({offers.length})</span>
-        </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Управляйте ценами и удаляйте неактуальные предложения
-        </p>
-      </div>
-
+    <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-[#14161d]">
       {error && (
-        <div className="mx-6 mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+        <div className="mx-4 mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-500 dark:text-red-400 sm:mx-6">
           {error}
         </div>
       )}
 
-      <div className="divide-y divide-zinc-800/60">
+      <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
         {offers.map((offer) => {
           const isDeleting = deletingId === offer.id;
           const isEditing = editingId === offer.id;
@@ -144,54 +136,54 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
             <div
               key={offer.id}
               className={cn(
-                "px-6 py-5 transition-colors",
+                "px-4 py-4 transition-colors sm:px-6 sm:py-5",
                 isBusy && "opacity-60"
               )}
             >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     {offer.gameSlug ? (
                       <Link
                         href={`/games/${offer.gameSlug}`}
-                        className="text-sm font-bold text-green-400 hover:text-green-300"
+                        className="inline-flex rounded-full bg-[#4f8cff]/10 px-2.5 py-0.5 text-xs font-bold text-[#2563eb] transition-colors hover:bg-[#4f8cff]/15 dark:text-[#4f8cff]"
                       >
                         {offer.gameTitle}
                       </Link>
                     ) : (
-                      <span className="text-sm font-bold text-zinc-400">
+                      <span className="inline-flex rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-bold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                         {offer.gameTitle}
                       </span>
                     )}
-                    <span className="rounded-full border border-zinc-800 bg-black/40 px-2 py-0.5 text-xs text-zinc-500">
+                    <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-xs text-muted-foreground dark:border-neutral-700 dark:bg-neutral-900">
                       {getCategoryDisplayLabel(offer.categoryRaw)}
                     </span>
-                    <span className="text-xs text-zinc-600">
+                    <span className="text-xs text-muted-foreground">
                       {formatDate(offer.createdAt)}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
                     {offer.description}
                   </p>
                 </div>
 
-                <div className="flex shrink-0 flex-col items-end gap-3 sm:flex-row sm:items-center">
+                <div className="flex shrink-0 items-center gap-3">
                   {isEditing ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Input
                         type="number"
                         min={1}
                         value={editPrice}
                         onChange={(e) => setEditPrice(e.target.value)}
-                        className={`w-28 ${fieldClassName}`}
+                        className={fieldClassName}
                         disabled={isSaving}
                       />
-                      <span className="text-sm text-zinc-500">₽</span>
+                      <span className="text-sm text-muted-foreground">₽</span>
                       <Button
                         size="sm"
                         disabled={isSaving}
                         onClick={() => handleSavePrice(offer.id)}
-                        className="border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20"
+                        className="rounded-xl"
                       >
                         {isSaving ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -201,50 +193,42 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
                       </Button>
                       <Button
                         size="icon-sm"
-                        variant="ghost"
+                        variant="outline"
                         disabled={isSaving}
                         onClick={cancelEdit}
-                        className="text-zinc-500 hover:text-white"
+                        className="rounded-xl border-neutral-200 dark:border-neutral-700"
                       >
                         <X className="size-4" />
                       </Button>
                     </div>
                   ) : (
                     <>
-                      <span className="text-xl font-black text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.25)]">
+                      <span className="text-lg font-bold tabular-nums text-neutral-900 dark:text-white sm:text-xl">
                         {formatPrice(offer.price)}
                       </span>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5">
                         <Button
-                          size="sm"
+                          size="icon-sm"
                           variant="outline"
                           disabled={isBusy || editingId !== null}
                           onClick={() => startEdit(offer)}
-                          className="border-zinc-700 bg-transparent text-zinc-400 hover:border-green-500/30 hover:text-green-400"
+                          aria-label="Изменить цену"
+                          className="rounded-xl border-neutral-200 text-neutral-600 hover:text-[#2563eb] dark:border-neutral-700 dark:text-neutral-300 dark:hover:text-[#4f8cff]"
                         >
-                          {isSaving ? (
-                            <Loader2 className="size-4 animate-spin" />
-                          ) : (
-                            <>
-                              <Pencil className="size-3.5" />
-                              Изменить цену
-                            </>
-                          )}
+                          <Pencil className="size-4" />
                         </Button>
                         <Button
-                          size="sm"
+                          size="icon-sm"
                           variant="outline"
                           disabled={isBusy || editingId !== null}
                           onClick={() => handleDelete(offer.id)}
-                          className="border-zinc-700 bg-transparent text-zinc-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400"
+                          aria-label="Удалить лот"
+                          className="rounded-xl border-neutral-200 text-neutral-600 hover:border-red-300 hover:text-red-600 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-red-500/40 dark:hover:text-red-400"
                         >
                           {isDeleting ? (
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
-                            <>
-                              <Trash2 className="size-3.5" />
-                              Удалить
-                            </>
+                            <Trash2 className="size-4" />
                           )}
                         </Button>
                       </div>
@@ -257,13 +241,9 @@ export function MyOffersList({ initialOffers }: MyOffersListProps) {
         })}
       </div>
 
-      <div className="border-t border-zinc-800/80 px-6 py-4">
-        <Button
-          asChild
-          variant="outline"
-          className="neon-glow-hover border-green-500/30 text-green-400 hover:bg-green-500/10"
-        >
-          <Link href="/offers/create">
+      <div className="border-t border-neutral-200 px-4 py-4 dark:border-neutral-800 sm:px-6">
+        <Button asChild className={cn("h-11", primaryButtonClassName)}>
+          <Link href="/sell">
             <Plus className="size-4" />
             Добавить лот
           </Link>

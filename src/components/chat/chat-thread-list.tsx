@@ -14,6 +14,9 @@ import {
 import type { ChatThread } from "@/lib/types/chat";
 import { cn } from "@/lib/utils";
 
+const searchInputClassName =
+  "h-10 rounded-xl border-neutral-200 bg-white pl-10 text-neutral-900 placeholder:text-muted-foreground focus-visible:ring-primary/30 dark:border-border dark:bg-[#1c1e27] dark:text-neutral-100";
+
 type ChatThreadListProps = {
   threads: ChatThread[];
   filteredThreads: ChatThread[];
@@ -32,16 +35,18 @@ export function ChatThreadList({
   onSelect,
 }: ChatThreadListProps) {
   return (
-    <div className="flex h-full flex-col bg-[#12131a]">
-      <div className="border-b border-border px-4 py-4">
-        <h1 className="text-lg font-bold text-[#e8eaef]">Мои сообщения</h1>
+    <div className="flex h-full flex-col bg-neutral-50 dark:bg-[#14161d]">
+      <div className="border-b border-neutral-200 px-4 py-4 dark:border-neutral-800">
+        <h1 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+          Мои сообщения
+        </h1>
         <div className="relative mt-3">
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Поиск по чатам..."
-            className="h-10 rounded-xl border-border bg-[#1c1e27] pl-10 focus-visible:ring-primary/30"
+            className={searchInputClassName}
           />
         </div>
       </div>
@@ -49,7 +54,7 @@ export function ChatThreadList({
       <ScrollArea className="flex-1">
         {threads.length === 0 ? (
           <div className="px-4 py-12 text-center">
-            <p className="text-sm font-semibold text-[#e8eaef]">
+            <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
               Пока нет диалогов
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -72,15 +77,15 @@ export function ChatThreadList({
                     onClick={() => onSelect(thread.orderId)}
                     className={cn(
                       "relative flex w-full gap-3 px-4 py-3 text-left transition-colors",
-                      "hover:bg-[#1c1e27]/80",
-                      isActive && "bg-[#1c1e27]"
+                      "hover:bg-neutral-100 dark:hover:bg-[#1c1e27]/80",
+                      isActive && "bg-neutral-100 dark:bg-[#1c1e27]"
                     )}
                   >
                     {isActive && (
                       <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-[#4f8cff]" />
                     )}
 
-                    <Avatar className="size-11 shrink-0 border border-border">
+                    <Avatar className="size-11 shrink-0 border border-neutral-200 dark:border-border">
                       <AvatarFallback className="bg-primary/15 text-sm font-bold text-primary">
                         {getInitial(thread.counterpartName)}
                       </AvatarFallback>
@@ -89,7 +94,7 @@ export function ChatThreadList({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-[#e8eaef]">
+                          <p className="truncate text-sm font-bold text-neutral-900 dark:text-neutral-100">
                             {thread.counterpartName}
                           </p>
                           {thread.isOnline && (

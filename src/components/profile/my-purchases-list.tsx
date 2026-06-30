@@ -56,9 +56,11 @@ export function MyPurchasesList({
 
   if (orders.length === 0) {
     return (
-      <div className="glass-panel rounded-2xl px-6 py-14 text-center">
-        <p className="text-lg font-bold text-white">Покупок пока нет</p>
-        <p className="mt-2 text-sm text-zinc-500">
+      <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-14 text-center dark:border-neutral-800 dark:bg-[#14161d]">
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">
+          Покупок пока нет
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
           Выберите лот в каталоге игры и нажмите «Купить»
         </p>
       </div>
@@ -67,21 +69,15 @@ export function MyPurchasesList({
 
   return (
     <>
-      <section className="glass-panel overflow-hidden rounded-2xl">
-        <div className="border-b border-zinc-800/80 px-6 py-5">
-          <h2 className="text-lg font-black text-white">
-            Мои покупки{" "}
-            <span className="text-neon-gradient">({orders.length})</span>
-          </h2>
-        </div>
-        <div className="divide-y divide-zinc-800/60">
+      <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-[#14161d]">
+        <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
           {orders.map((order) => {
             const existingRating = reviewsByOrderId.get(order.id);
 
             return (
               <div
                 key={order.id}
-                className="px-6 py-5 transition-colors duration-200 hover:bg-green-500/[0.03]"
+                className="px-4 py-4 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/40 sm:px-6 sm:py-5"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
@@ -89,26 +85,26 @@ export function MyPurchasesList({
                       {order.gameSlug ? (
                         <Link
                           href={`/games/${order.gameSlug}`}
-                          className="text-sm font-bold text-green-400 hover:text-green-300"
+                          className="inline-flex rounded-full bg-[#4f8cff]/10 px-2.5 py-0.5 text-xs font-bold text-[#2563eb] transition-colors hover:bg-[#4f8cff]/15 dark:text-[#4f8cff]"
                         >
                           {order.gameTitle}
                         </Link>
                       ) : (
-                        <span className="text-sm font-bold text-zinc-400">
+                        <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400">
                           {order.gameTitle}
                         </span>
                       )}
                       <OrderStatusBadge status={order.status} />
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
                       {order.offerDescription}
                     </p>
-                    <p className="mt-2 text-xs text-zinc-600">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       Продавец: {order.sellerName} · {formatDate(order.createdAt)}
                     </p>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-3">
-                    <p className="text-xl font-black text-green-400">
+                  <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
+                    <p className="text-lg font-bold tabular-nums text-neutral-900 dark:text-white">
                       {formatPrice(order.offerPrice)}
                     </p>
                     <OpenChatButton orderId={order.id} />

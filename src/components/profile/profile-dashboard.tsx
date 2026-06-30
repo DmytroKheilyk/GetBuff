@@ -6,8 +6,8 @@ import { MySalesList } from "@/components/profile/my-sales-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProfileOffer } from "@/lib/queries/profile-offers";
 import type { Order } from "@/lib/types/order";
-
 import type { OrderReviewSummary } from "@/lib/types/review";
+import { cn } from "@/lib/utils";
 
 type ProfileDashboardProps = {
   offers: ProfileOffer[];
@@ -15,6 +15,22 @@ type ProfileDashboardProps = {
   purchaseReviews: OrderReviewSummary[];
   sales: Order[];
 };
+
+function TabCountBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+
+  return (
+    <span
+      className={cn(
+        "ml-1.5 inline-flex size-5 items-center justify-center rounded-full",
+        "bg-neutral-200 text-[10px] font-semibold text-neutral-600",
+        "dark:bg-primary/15 dark:text-primary"
+      )}
+    >
+      {count}
+    </span>
+  );
+}
 
 export function ProfileDashboard({
   offers,
@@ -24,39 +40,30 @@ export function ProfileDashboard({
 }: ProfileDashboardProps) {
   return (
     <Tabs defaultValue="listings" className="gap-6">
-      <TabsList className="glass-panel h-auto w-full flex-wrap justify-start gap-1 p-1">
+      <TabsList
+        variant="line"
+        className="h-auto w-full justify-start gap-0 border-b border-neutral-200 bg-transparent p-0 dark:border-neutral-800"
+      >
         <TabsTrigger
           value="listings"
-          className="font-semibold text-zinc-400 transition-all duration-300 data-active:border-green-500/30 data-active:bg-green-500/15 data-active:text-green-400 data-active:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
+          className="rounded-none px-4 pb-3 pt-2 text-sm font-medium text-muted-foreground data-active:text-neutral-900 dark:data-active:text-white"
         >
           Мои лоты
-          {offers.length > 0 && (
-            <span className="ml-1.5 rounded-full bg-green-500/15 px-1.5 py-0.5 text-[10px] text-green-400">
-              {offers.length}
-            </span>
-          )}
+          <TabCountBadge count={offers.length} />
         </TabsTrigger>
         <TabsTrigger
           value="purchases"
-          className="font-semibold text-zinc-400 transition-all duration-300 data-active:border-green-500/30 data-active:bg-green-500/15 data-active:text-green-400 data-active:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
+          className="rounded-none px-4 pb-3 pt-2 text-sm font-medium text-muted-foreground data-active:text-neutral-900 dark:data-active:text-white"
         >
           Мои покупки
-          {purchases.length > 0 && (
-            <span className="ml-1.5 rounded-full bg-green-500/15 px-1.5 py-0.5 text-[10px] text-green-400">
-              {purchases.length}
-            </span>
-          )}
+          <TabCountBadge count={purchases.length} />
         </TabsTrigger>
         <TabsTrigger
           value="sales"
-          className="font-semibold text-zinc-400 transition-all duration-300 data-active:border-green-500/30 data-active:bg-green-500/15 data-active:text-green-400 data-active:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
+          className="rounded-none px-4 pb-3 pt-2 text-sm font-medium text-muted-foreground data-active:text-neutral-900 dark:data-active:text-white"
         >
           Мои продажи
-          {sales.length > 0 && (
-            <span className="ml-1.5 rounded-full bg-green-500/15 px-1.5 py-0.5 text-[10px] text-green-400">
-              {sales.length}
-            </span>
-          )}
+          <TabCountBadge count={sales.length} />
         </TabsTrigger>
       </TabsList>
 

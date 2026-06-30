@@ -54,7 +54,7 @@ export default async function ChatsPage({ searchParams }: ChatsPageProps) {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-white text-foreground dark:bg-[#0e1015]">
       <SiteHeader />
       <ChatsPageContent
         threads={threads}

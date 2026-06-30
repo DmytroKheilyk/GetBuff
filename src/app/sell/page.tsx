@@ -21,7 +21,7 @@ export default async function SellPage() {
   const games = await fetchGames();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-white text-foreground dark:bg-[#0e1015]">
       <SiteHeader />
       <main className="relative flex-1">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(79,140,255,0.08),transparent_55%)]" />

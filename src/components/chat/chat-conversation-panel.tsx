@@ -33,6 +33,9 @@ import {
 } from "@/lib/types/message";
 import { cn } from "@/lib/utils";
 
+const messageInputClassName =
+  "flex-1 rounded-xl border-neutral-200 bg-white text-neutral-900 placeholder:text-muted-foreground focus-visible:ring-primary/30 dark:border-border dark:bg-[#1c1e27] dark:text-white";
+
 type ChatConversationPanelProps = {
   thread: ChatThread | null;
   initialMessages: ChatMessage[];
@@ -46,27 +49,27 @@ function OfferMiniCard({ context }: { context: ChatContext }) {
   const posterSrc = getGamePosterSrc(context.gameSlug);
 
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-border bg-[#1c1e27] px-2.5 py-2">
-      <div className="size-9 shrink-0 overflow-hidden rounded-lg border border-border">
+    <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-2.5 py-2 dark:border-border dark:bg-[#1c1e27]">
+      <div className="size-9 shrink-0 overflow-hidden rounded-lg border border-neutral-200 dark:border-border">
         {posterSrc ? (
           <CatalogImage
             src={posterSrc}
             alt={context.gameTitle}
-            fallbackClass="bg-[#2a2d38]"
+            fallbackClass="bg-neutral-200 dark:bg-[#2a2d38]"
             fallbackText={context.gameTitle.slice(0, 2).toUpperCase()}
             fit="cover"
           />
         ) : (
-          <div className="flex size-full items-center justify-center bg-[#2a2d38] text-[10px] font-bold text-[#e8eaef]">
+          <div className="flex size-full items-center justify-center bg-neutral-200 text-[10px] font-bold text-neutral-900 dark:bg-[#2a2d38] dark:text-neutral-100">
             {context.gameTitle.slice(0, 2).toUpperCase()}
           </div>
         )}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-[#e8eaef]">
+        <p className="truncate text-xs font-semibold text-neutral-900 dark:text-neutral-100">
           {context.offerDescription}
         </p>
-        <p className="text-[11px] font-bold text-[#4f8cff]">
+        <p className="text-[11px] font-bold text-[#2563eb] dark:text-[#4f8cff]">
           {formatPrice(context.offerPrice)}
         </p>
       </div>
@@ -182,8 +185,8 @@ export function ChatConversationPanel({
 
   if (!thread || !context) {
     return (
-      <div className="hidden h-full flex-col items-center justify-center bg-[#0f1016] px-6 text-center md:flex">
-        <p className="text-base font-semibold text-[#e8eaef]">
+      <div className="hidden h-full flex-col items-center justify-center bg-white px-6 text-center dark:bg-[#111319] md:flex">
+        <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
           Выберите диалог слева
         </p>
         <p className="mt-2 max-w-sm text-sm text-muted-foreground">
@@ -194,8 +197,8 @@ export function ChatConversationPanel({
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#0f1016]">
-      <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+    <div className="flex h-full flex-col bg-white dark:bg-[#111319]">
+      <div className="flex items-center gap-3 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
         {showBackButton && (
           <Button
             type="button"
@@ -214,7 +217,7 @@ export function ChatConversationPanel({
             {getInitial(thread.counterpartName)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-[#e8eaef]">
+            <p className="truncate text-sm font-bold text-neutral-900 dark:text-neutral-100">
               {thread.counterpartName}
             </p>
             <div className="mt-0.5 flex flex-wrap items-center gap-2">
@@ -223,7 +226,7 @@ export function ChatConversationPanel({
               )}
               <Badge
                 variant="outline"
-                className="h-5 border-border px-1.5 py-0 text-[10px] text-muted-foreground"
+                className="h-5 border-neutral-200 px-1.5 py-0 text-[10px] text-muted-foreground dark:border-border"
               >
                 {CHAT_ORDER_STATUS_LABELS[thread.status]}
               </Badge>
@@ -236,7 +239,7 @@ export function ChatConversationPanel({
         </div>
       </div>
 
-      <div className="border-b border-border px-4 py-2 sm:hidden">
+      <div className="border-b border-neutral-200 px-4 py-2 dark:border-neutral-800 sm:hidden">
         <OfferMiniCard context={context} />
       </div>
 
@@ -270,7 +273,7 @@ export function ChatConversationPanel({
                       "max-w-[85%] rounded-2xl px-4 py-2.5 shadow-md sm:max-w-[70%]",
                       isOwn
                         ? "rounded-br-md bg-[#4f8cff] text-white"
-                        : "rounded-bl-md bg-[#1c1e27] text-[#e8eaef]"
+                        : "rounded-bl-md bg-neutral-100 text-black dark:bg-[#1c1e27] dark:text-white"
                     )}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
@@ -279,7 +282,9 @@ export function ChatConversationPanel({
                     <p
                       className={cn(
                         "mt-1.5 text-[10px] tabular-nums",
-                        isOwn ? "text-white/70" : "text-muted-foreground"
+                        isOwn
+                          ? "text-white/70"
+                          : "text-neutral-500 dark:text-muted-foreground"
                       )}
                     >
                       {formatMessageTime(message.createdAt)}
@@ -293,7 +298,7 @@ export function ChatConversationPanel({
         </div>
       </ScrollArea>
 
-      <div className="border-t border-border bg-[#12131a]/95 px-4 py-3 backdrop-blur-md">
+      <div className="border-t border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur-md dark:border-neutral-800 dark:bg-[#12131a]/95">
         <form onSubmit={handleSend} className="mx-auto flex max-w-3xl gap-2">
           <Button
             type="button"
@@ -311,7 +316,7 @@ export function ChatConversationPanel({
             onKeyDown={handleKeyDown}
             placeholder="Введите сообщение..."
             disabled={sending}
-            className="flex-1 rounded-xl border-border bg-[#1c1e27] focus-visible:ring-primary/30"
+            className={messageInputClassName}
           />
           <Button
             type="submit"
