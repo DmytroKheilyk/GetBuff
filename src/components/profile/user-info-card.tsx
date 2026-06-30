@@ -2,7 +2,7 @@
 
 import type { User } from "@supabase/supabase-js";
 import { Calendar, Camera, Loader2, Mail, Pencil, Wallet } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ProfileSocialLinks,
@@ -162,20 +162,26 @@ export function UserInfoCard({ user, balance: initialBalance }: UserInfoCardProp
   const [draftProfile, setDraftProfile] = useState<SavedProfile | null>(null);
 
   const registeredAt = formatUserRegisteredAt(user);
-  const savedProfile = profile
-    ? {
-        nickname: profile.nickname,
-        bio: profile.bio,
-        avatarBase64: profile.avatarBase64,
-        socials: profile.socials,
-      }
-    : null;
+  const savedProfile = useMemo(
+    (): SavedProfile | null =>
+      profile
+        ? {
+            nickname: profile.nickname,
+            bio: profile.bio,
+            avatarBase64: profile.avatarBase64,
+            socials: profile.socials,
+          }
+        : null,
+    [profile]
+  );
 
   useEffect(() => {
     if (savedProfile && !isEditing) {
-      setDraftProfile(savedProfile);
+      if (JSON.stringify(savedProfile) !== JSON.stringify(draftProfile)) {
+        setDraftProfile(savedProfile);
+      }
     }
-  }, [savedProfile, isEditing]);
+  }, [savedProfile, isEditing, draftProfile]);
 
   async function handleTopUp() {
     setTopUpLoading(true);

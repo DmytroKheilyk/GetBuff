@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -18,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 const SEARCH_PRODUCTS = USE_MOCK_DATA ? mockProducts : [];
 const MAX_RESULTS = 12;
+const OUTSIDE_CLOSE_DELAY_MS = 150;
 
 type HeaderSearchProps = {
   className?: string;
@@ -26,8 +26,10 @@ type HeaderSearchProps = {
 
 export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const selectingProductRef = useRef(false);
+  const outsideCloseTimerRef = useRef<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<MockProduct[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -52,17 +54,36 @@ export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
   }, []);
 
   useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    }
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectingProductRef.current) return;
 
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        if (outsideCloseTimerRef.current !== null) {
+          window.clearTimeout(outsideCloseTimerRef.current);
+        }
+
+        outsideCloseTimerRef.current = window.setTimeout(() => {
+          if (selectingProductRef.current) return;
+
+          setResults([]);
+          setSearchQuery("");
+          setIsDropdownOpen(false);
+          outsideCloseTimerRef.current = null;
+        }, OUTSIDE_CLOSE_DELAY_MS);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      if (outsideCloseTimerRef.current !== null) {
+        window.clearTimeout(outsideCloseTimerRef.current);
+      }
+    };
   }, []);
 
   function handleSubmit(e: React.FormEvent) {
@@ -82,15 +103,39 @@ export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
     }
   }
 
-  function handleResultClick() {
-    clearSearch();
-  }
+  const handleProductClick = useCallback((productId: string) => {
+    selectingProductRef.current = true;
+
+    if (outsideCloseTimerRef.current !== null) {
+      window.clearTimeout(outsideCloseTimerRef.current);
+      outsideCloseTimerRef.current = null;
+    }
+
+    window.location.assign(`/products/${productId}`);
+  }, []);
+
+  const handleResultsMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLUListElement>) => {
+      const item = (event.target as HTMLElement).closest(
+        "[data-search-product-id]"
+      );
+
+      if (!item) return;
+
+      event.preventDefault();
+      const productId = item.getAttribute("data-search-product-id");
+      if (productId) {
+        handleProductClick(productId);
+      }
+    },
+    [handleProductClick]
+  );
 
   const trimmedQuery = searchQuery.trim();
   const showDropdown = isDropdownOpen && trimmedQuery.length > 0;
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)}>
+    <div ref={searchRef} className={cn("relative w-full", className)}>
       <form onSubmit={handleSubmit} className="relative w-full">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -148,18 +193,20 @@ export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
               Ничего не найдено по запросу «{trimmedQuery}»
             </p>
           ) : (
-            <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            <ul
+              className="divide-y divide-neutral-100 dark:divide-neutral-800"
+              onMouseDown={handleResultsMouseDown}
+            >
               {results.map((product) => {
                 const card = toPopularProductCard(product);
 
                 return (
                   <li key={product.id}>
-                    <Link
-                      href={`/products/${product.id}`}
+                    <div
                       role="option"
-                      onClick={handleResultClick}
+                      data-search-product-id={product.id}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5",
+                        "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left",
                         "transition-colors hover:bg-neutral-50",
                         "dark:hover:bg-[#14161d]"
                       )}
@@ -199,7 +246,7 @@ export function HeaderSearch({ className, inputClassName }: HeaderSearchProps) {
                       <span className="shrink-0 text-sm font-bold tabular-nums text-[#4f8cff]">
                         {formatProductPrice(product.price)}
                       </span>
-                    </Link>
+                    </div>
                   </li>
                 );
               })}
