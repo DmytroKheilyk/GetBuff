@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "@supabase/supabase-js";
-import { Calendar, Camera, Loader2, Mail, Pencil, Wallet, Youtube } from "lucide-react";
+import { Calendar, Camera, Loader2, Mail, Pencil, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -53,6 +53,17 @@ function DiscordIcon({ className }: { className?: string }) {
 function VkIcon({ className }: { className?: string }) {
   return (
     <span className={cn("text-[11px] font-black leading-none", className)}>VK</span>
+  );
+}
+
+function YouTubeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M21.58 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.82.43A2.5 2.5 0 0 0 2.42 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .42 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.82-.43a2.5 2.5 0 0 0 1.76-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.42-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"
+      />
+    </svg>
   );
 }
 
@@ -367,7 +378,7 @@ export function UserInfoCard({ user, balance: initialBalance }: UserInfoCardProp
                     iconClassName="text-[#0077FF]"
                   />
                   <SocialLinkInput
-                    icon={Youtube}
+                    icon={YouTubeIcon}
                     label="YouTube"
                     value={draftProfile.socials.youtube}
                     onChange={(value) =>

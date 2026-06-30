@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Youtube } from "lucide-react";
 
 import { resolveSocialHref, type SocialLinks } from "@/lib/profile-storage";
 import { cn } from "@/lib/utils";
@@ -39,6 +38,17 @@ function VkIcon({ className }: { className?: string }) {
   );
 }
 
+function YouTubeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M21.58 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.82.43A2.5 2.5 0 0 0 2.42 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .42 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.82-.43a2.5 2.5 0 0 0 1.76-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.42-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"
+      />
+    </svg>
+  );
+}
+
 const SOCIAL_CONFIG = [
   {
     key: "telegram" as const,
@@ -61,7 +71,7 @@ const SOCIAL_CONFIG = [
   {
     key: "youtube" as const,
     label: "YouTube",
-    Icon: Youtube,
+    Icon: YouTubeIcon,
     className: "bg-[#FF0000]/15 text-[#FF0000] hover:bg-[#FF0000]/25",
   },
 ];
