@@ -1,38 +1,33 @@
 function PulseBlock({ className }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-xl bg-zinc-900/80 ring-1 ring-zinc-800/80 ${className ?? ""}`}
+      className={`animate-pulse rounded-2xl bg-[#23262f] ${className ?? ""}`}
     />
   );
 }
 
 export function HomePageSkeleton() {
   return (
-    <>
-      <section className="mb-14 max-w-4xl space-y-4">
-        <PulseBlock className="h-7 w-48" />
-        <PulseBlock className="h-16 w-full max-w-xl" />
-        <PulseBlock className="h-16 w-full max-w-lg" />
-        <PulseBlock className="mt-8 h-14 w-full max-w-2xl" />
-      </section>
+    <div className="space-y-7 sm:space-y-9">
+      <PulseBlock className="h-[260px] rounded-3xl sm:h-[320px]" />
 
-      <section className="space-y-6">
-        <PulseBlock className="h-10 w-64" />
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <PulseBlock key={i} className="h-64" />
+      <div className="flex gap-3 overflow-hidden sm:gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="flex shrink-0 flex-col items-center gap-2">
+            <PulseBlock className="size-[4.25rem] sm:size-[4.75rem]" />
+            <PulseBlock className="h-3 w-14" />
+          </div>
+        ))}
+      </div>
+
+      <section className="space-y-4">
+        <PulseBlock className="h-6 w-44" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <PulseBlock key={i} className="aspect-[4/5] sm:aspect-square" />
           ))}
         </div>
       </section>
-
-      <section className="mt-16 space-y-6">
-        <PulseBlock className="h-10 w-72" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <PulseBlock key={i} className="h-56" />
-          ))}
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="60%" stop-color="#333"/>
+      <stop offset="100%" stop-color="#555"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg)"/>
+  <text x="200" y="240" text-anchor="middle" fill="#fff" font-size="36" font-weight="900" font-family="Arial,sans-serif">CALL OF</text>
+  <text x="200" y="290" text-anchor="middle" fill="#ff6600" font-size="36" font-weight="900" font-family="Arial,sans-serif">DUTY</text>
+</svg>
